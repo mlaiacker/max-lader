@@ -2,6 +2,8 @@
 DIY Battery Charger, 12V Input, 0-25V Output, 5.5A, using AVR
 With these components the charger is limited to about 120W and maximum input voltage of about 15V
 
+See also: 
+http://mlaiacker.no-ip.org/Modellbau/AVR-Lader/
 ## Charging
 Type | Cells
 ----|----
