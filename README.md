@@ -10,6 +10,8 @@ NIMH/NICA| 1-16
 PB | 1-6 (2-12V)
 Programmable Power Supply | 0-25V 0-5.5A
 
+
+![max-lader](https://raw.githubusercontent.com/mlaiacker/max-lader/master/doc/images/max-lader_big_heatsink.jpg)
 ![max-laderpcb](https://raw.githubusercontent.com/mlaiacker/max-lader/master/doc/images/max-lader_pcb2.jpg)
-Format: ![Alt Text](url)
+
 
