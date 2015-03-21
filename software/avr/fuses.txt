@@ -1,0 +1,40 @@
+
+Zum Setzen der Fusebits Mega8 in eine externe Programmierschaltung mit Quarz einbauen.
+Programmieren der Fusebits und des Bootloders ist nicht im max-Lader möglich (keine isp Schnittstelle).
+
+1 = häckchen bei ponyprog
+
+atmega8:
+cksel0-3=0
+sut0=0
+sut1=1
+boden=1
+bodlevel(0)=0
+bootrst=1
+bootz0=0
+bootz1=1
+esave=1
+ckopt=1
+spien=1
+wdton=0
+rstdisbl=0
+
+atmega168:
+cksel3=1
+cksel2=0
+cksel1=0
+cksel0=0
+sut1=1
+sut0=0
+bodlevel2=0
+bodlevel1=1
+bodlevel0=1
+bootrst=1
+bootz1=1
+bootz0=0
+esave=1
+ckopt=1
+spien=1
+wdton=0
+rstdisbl=0
+ckdiv8=0

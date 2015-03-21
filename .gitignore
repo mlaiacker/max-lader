@@ -220,3 +220,4 @@ pip-log.txt
 software/avr/main.lss
 *.elf
 *.eep
+*.s#1
