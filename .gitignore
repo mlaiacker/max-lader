@@ -221,3 +221,6 @@ software/avr/main.lss
 *.elf
 *.eep
 *.s#1
+*.lss
+*.sym
+*.map

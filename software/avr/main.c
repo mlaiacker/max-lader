@@ -75,16 +75,6 @@ void init(void){
 	TCCR0B = 0x04;
 	#endif
 	
-
-	#ifdef ADS7822
-	sbi(ADS7822_PORT_CS,ADS7822_CS); // ss
-	sbi(ADS7822_DDR_CS,ADS7822_CS);
-	
-	sbi(ADS7822_PORT_SCK,ADS7822_SCK); // sck
-	sbi(ADS7822_DDR_SCK,ADS7822_SCK);
-	/* Enable SPI, Master, set clock rate fck/16, MSB first */
-	SPCR = (1<<SPE)|(1<<MSTR)|(0<<SPR1)|(1<<SPR0)|(0<<DORD)|(0<<CPOL)|(0<<CPHA);
-	#endif
 	
 	ADMUX = (0<<ADLAR) | (ADC_REFERENCE<<6);
 	ADCSR = ((0<<ADFR)|(1<<ADEN)|(1<<ADIE)|(1<<ADSC)|(1<<ADIF) | ADC_PRESCALE);
@@ -110,15 +100,11 @@ void init(void){
 	ladenOff();
 	BEEP_ON;
 	lcdGotoY(0);
-#ifdef ADS7822
-	lcdPrint(" MAX-Lader 12bit");
-#else
 	#if defined (__AVR_ATmega168__)
 		lcdPrint("   MAX-Lader16  ");
 	#elif defined (__AVR_ATmega8__)
 		lcdPrint("   MAX-Lader    ");
 	#endif
-#endif
 	lcdGotoY(1);
 	lcdPrint("Version:");
 	lcdNum(LADER_VERSION,2,1);
@@ -285,10 +271,6 @@ int main(void)
 			{
 				regler.cOut += charger.i;
 			}
-#ifdef TASTEN_ADC
-			if(menu.tastenTmp == a2dAvg(TASTEN)/40) menu.tastenVal = menu.tastenTmp;
-			menu.tastenTmp = a2dAvg(TASTEN)/40;
-#endif
 			readTaste(&tasteL,TASTE_L);
 			readTaste(&tasteM,TASTE_M);
 			readTaste(&tasteR,TASTE_R);

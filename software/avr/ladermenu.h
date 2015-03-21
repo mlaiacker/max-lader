@@ -69,10 +69,6 @@ typedef struct
 	s16 ladenNum;
 	s16 topNum;
 	s16 uOut,iOut;
-#ifdef TASTEN_ADC
-	unsigned char tastenVal; // adc wert der tasten
-	unsigned char tastenTmp; // adc wert der tasten
-#endif
 } tMenu;
 
 
