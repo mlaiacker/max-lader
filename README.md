@@ -5,9 +5,9 @@ With these components the charger is limited to about 120W and maximum input vol
 ## Charging
 Type | Cells
 ----|----
-Lipo | 1-6
+LiPo | 1-6
 LiFe | 1-7
-NIMH/NICA| 1-16
+NiMh/NiCa| 1-16
 PB | 1-6 (2-12V)
 Programmable Power Supply | 0-25V 0-5.5A
 ## Characteristics
@@ -25,6 +25,7 @@ Efficiency | up to 89%
 ## Images
 MAX-Lader with big heat sink which not really necessary.<br>
 ![max-lader](https://raw.githubusercontent.com/mlaiacker/max-lader/master/doc/images/max-lader_big_heatsink.jpg)
+<br>
 The charger without the LCD and enclosure<br>
 ![max-laderpcb](https://raw.githubusercontent.com/mlaiacker/max-lader/master/doc/images/max-lader_pcb2.jpg)
 ## Electronics
