@@ -255,11 +255,13 @@ end:
 
 
 # Display size of file.
-sizebefore:
-	@if [ -f $(TARGET).elf ]; then echo; echo $(MSG_SIZE_BEFORE); $(ELFSIZE); echo; fi
+sizebefore: $(TARGET).elf
+	@echo $(MSG_SIZE_BEFORE) 
+	@$(ELFSIZE)
 
-sizeafter:
-	@if [ -f $(TARGET).elf ]; then echo; echo $(MSG_SIZE_AFTER); $(ELFSIZE); echo; fi
+sizeafter: $(TARGET).elf
+	@echo $(MSG_SIZE_AFTER)
+	@$(ELFSIZE)
 
 
 
@@ -389,14 +391,14 @@ clean_list :
 # (see the SHELL variable defined above).
 # This may not work with other shells or other seds.
 #
-%.d: %.c
-	set -e; $(CC) -MM $(ALL_CFLAGS) $< \
-	| sed 's,\(.*\)\.o[ :]*,\1.o \1.d : ,g' > $@; \
-	[ -s $@ ] || rm -f $@
+#%.d: %.c
+#	set -e; $(CC) -MM $(ALL_CFLAGS) $< \
+#	| sed 's,\(.*\)\.o[ :]*,\1.o \1.d : ,g' > $@; \
+#	[ -s $@ ] || rm -f $@
 
 
 # Remove the '-' if you want to see the dependency files generated.
--include $(SRC:.c=.d)
+#-include $(SRC:.c=.d)
 
 
 

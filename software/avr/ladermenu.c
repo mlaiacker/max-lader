@@ -17,7 +17,7 @@
 #include "pwm.h"
 
 
-tModeString modeName[MODE_NUM+2]	PROGMEM = // Lademodus
+const tModeString modeName[MODE_NUM+2]	PROGMEM = // Lademodus
 {
 	"LiPo",
 	"LiFe",
@@ -39,7 +39,7 @@ s16	param2Max[MODE_NUM] =
 };
 
 typedef char tErrorString[12];
-tErrorString errorName[ERROR_NUM]	PROGMEM = // Fehlermeldungen
+const tErrorString errorName[ERROR_NUM]	PROGMEM = // Fehlermeldungen
 {    
 	"    Uin    ", 
 	"Temperatur ",

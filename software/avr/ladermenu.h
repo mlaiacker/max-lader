@@ -80,7 +80,7 @@ extern tTaste	tasteL,tasteM,tasteR;
 extern unsigned char eeChargeMode EEPROM;
 
 typedef char tModeString[5];
-extern tModeString modeName[MODE_NUM+2]	PROGMEM;
+extern const tModeString modeName[MODE_NUM+2]	PROGMEM;
 
 // eeprom zeugs
 
