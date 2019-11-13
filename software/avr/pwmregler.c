@@ -24,8 +24,16 @@ void pwmregler(void)
 		if((regler.uSoll == 0) || (regler.iMax == 0))// || (regler.uOut > PWM_UMAX))
 		{
 			regler.pwm = 0;
-		}
-		else
+/*			if(regler.iMax == 0)
+			{
+				if(charger.uSoll<=regler.uIn)
+				{
+				  // bei kleinen spannungen kommt etwa das doppelt der spannung raus wenn man
+				  // pwm vorsteuert, umso näher die spannung an die eingaspannung umso besser stimmt die rechnung
+				  regler.pwm =  (charger.uSoll/8*PWM_DIV/(regler.uIn/8))*255; // test der teorie
+				}
+			}*/
+		} else
 		{
 			if(regler.iOut>=IOUT_GRENZWERT)
 			{
@@ -40,12 +48,8 @@ void pwmregler(void)
 				regler.error = (regler.iMax - regler.iOut - div/4) / div ; // strombegrenzung
 			} else
 			{
-//				#ifdef ADS7822
 				regler.error = ((regler.uSoll - regler.uOut)); // spannungsregelung
 				if(regler.error>0) regler.error /=(regler.uSoll/700+1);// spannung nicht grösser werden lassen als soll
-//				#else
-//				regler.error = ((regler.uSoll - regler.uOut)/(regler.uSoll/256+1)); // spannungsregelung
-//				#endif
 			}
 			if(regler.error>2*PWM_DIV) regler.pwm += 2*PWM_DIV;
 			else if(regler.error<-2*PWM_DIV) regler.pwm -= 2*PWM_DIV;
@@ -62,11 +66,7 @@ void pwmregler(void)
 	if(regler.pwm<0) regler.pwm = 0;
 	pwmSet(regler.pwm/PWM_DIV);
 }
-// die geladene kapazität aufsummieren, hier sind es aber noch rohdaten, umgerechnet wird in laden.c
-/*void pwmreglerCOut(void)
-{
-}
-*/
+
 // jede sekunde de status des reglers überprüfen und eventuell fehler auslösen
  void pwmreglerSekunde(void)
 {

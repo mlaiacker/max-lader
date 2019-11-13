@@ -17,9 +17,10 @@
 #include "pwm.h"
 
 
-const tModeString modeName[MODE_NUM+2]	PROGMEM = // Lademodus
+const tModeString modeName[]	PROGMEM = // Lademodus
 {
 	"LiPo",
+	"LiHv",
 	"LiFe",
 	"NiMh",
 	"NiCa",
@@ -28,14 +29,32 @@ const tModeString modeName[MODE_NUM+2]	PROGMEM = // Lademodus
 	"ENDE",
 	"ERR "
 };
-s16	param2Max[MODE_NUM] =
+
+const s16	param2Max[] =
 {
 	LIPO_CELL_MAX,
+	LIHV_CELL_MAX,
 	LIFE_CELL_MAX,
 	9900, //mAh*10
 	9900, //mAh*10
 	PB_CELL_MAX,
 	UOUT_MAX
+};
+
+const s16 cell_stop[]={
+	LIPO_UCELL_STOP,
+	LIHV_UCELL_STOP,
+	LIFE_UCELL_STOP,
+	0,
+	0,
+	PB_UCELL_STOP,
+	0
+};
+
+const s16 cell_min[]={
+	LIPO_UCELL_MIN,
+	LIPO_UCELL_MIN,
+	LIFE_UCELL_MIN,
 };
 
 typedef char tErrorString[12];
@@ -131,7 +150,7 @@ void showMode(void)
 		lcdNum(settings.param2/10,3,1);
 		lcdDataWrite('V');
 	} else
-	if((charger.mode==eModeLiPo) || (charger.mode==eModeLiFe))
+	if(charger.mode<MODE_LI_NUM)
 	{
 		lcdNum(settings.param2,2,0);
 		lcdPrint("Zell");
@@ -159,11 +178,13 @@ void showParam2(void)
 		lcdNum(settings.param2,4,2);
 		lcdPrint("V ");
 	} else
-	if(charger.mode==eModeLiPo || charger.mode==eModePB || charger.mode==eModeLiFe)
+	if(charger.mode<MODE_LI_NUM || charger.mode==eModePB)
 	{
 		lcdPrint("Zellen=");
 		lcdNum(settings.param2,1,0);
-		lcdPrintSpaces(8);
+		lcdPrintSpaces(2);
+		lcdNum(settings.param2*cell_stop[charger.mode]/10,4,1);
+		lcdDataWrite('V');
 	} else
 	if(charger.mode==eModeNiMh||charger.mode==eModeNiCa)
 	{
@@ -431,7 +452,9 @@ void showMenu(void)
 		{
 			if(menu.topNum==eMenuStart)
 			{
-				lcdPrintSpaces(6);
+				lcdNum(regler.uIn/10,3,1);
+				lcdPrint("V ");
+//				lcdPrintSpaces(6);
 				lcdPrint("Start  -> ");
 			} else
 			{

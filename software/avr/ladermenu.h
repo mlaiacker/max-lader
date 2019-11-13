@@ -75,12 +75,14 @@ typedef struct
 // globale Variablen
 extern tSettings settings;
 extern tMenu menu;
-extern tSettings eeSettings[MODE_NUM] EEPROM;
+extern tSettings eeSettings[] EEPROM;
 extern tTaste	tasteL,tasteM,tasteR;
 extern unsigned char eeChargeMode EEPROM;
 
 typedef char tModeString[5];
 extern const tModeString modeName[MODE_NUM+2]	PROGMEM;
+extern const s16 cell_stop[MODE_NUM];
+extern const s16 cell_min[MODE_LI_NUM];
 
 // eeprom zeugs
 

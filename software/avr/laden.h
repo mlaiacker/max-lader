@@ -22,22 +22,19 @@
 #define AKKU_DETECT_U	(400) //mV/10
 #define I_MESSEN		(2)	//bits
 
-#define LIPO_UCELL		(370)	//mV/10
+#define LI_TIME_MAX	(3*60*60)	//sekunden
+
 #define LIPO_UCELL_STOP	(420)	//mV/10
 #define LIPO_UCELL_MIN	(280)	//mV/10
 #define LIPO_CELL_MAX	(6)		//zellen
-#define LIPO_TIME_MAX	(3*60*60)	//sekunden
 #define LIPO_TIME_BEGIN	(30) //sekunden
-#define LIPO_I_END		(150) //mA
 
+#define LIHV_UCELL_STOP	(430)	//mV/10
+#define LIHV_CELL_MAX	(6)	//zellen
 
-#define LIFE_UCELL		(330)	//mV/10 Nennspannung
 #define LIFE_UCELL_STOP	(360)	//mV/10 Ladeschlussspannung
 #define LIFE_UCELL_MIN	(200)	//mV/10 Minimale Spannung für Erkennung von falschen Zellenanzahlen
 #define LIFE_CELL_MAX	(7)		//zellen
-#define LIFE_TIME_MAX	(3*60*60)	//sekunden
-#define LIFE_TIME_BEGIN	(30) //sekunden
-#define LIFE_I_END		(150) //mA
 
 #define NICA_TIME_BEGIN			(30) // sekunden
 #define NICA_TIME_BEGIN2		(180) //sekunden bis zur abschaltung möglich,nach stromänderung
@@ -66,6 +63,7 @@
 typedef enum 
 {
 	eModeLiPo,
+	eModeLiHv,
 	eModeLiFe,
 	eModeNiMh,
 	eModeNiCa,
@@ -74,7 +72,9 @@ typedef enum
 	eModeEnde,
 	eModeError
 } eMode;
+
 #define MODE_NUM	(eModeEnde) // Anzahl der Lademodi
+#define MODE_LI_NUM	(eModeNiMh) // Anzahl der Lipo Lademodi
 
 #define CHARGER_BUF_LEN	(2)
 typedef struct 

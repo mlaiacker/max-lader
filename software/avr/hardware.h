@@ -5,7 +5,7 @@
 #include "migration8-168.h"
 #endif
 
-#define LADER_VERSION	(15)
+#define LADER_VERSION	(16)
 
 #ifndef F_CPU
 	#if defined (__AVR_ATmega168__)
@@ -190,7 +190,7 @@
 #define BITS2COUT(x)	(((u32)(x))/(REGEL_COUT_FREQ*60L*60L*10L)) //mAh (REGEL_FREQ*60*60)
 #define COUT2BITS(x)	(((u32)(x))*(REGEL_COUT_FREQ*60L*60L*10L)) //mAh (REGEL_FREQ*60*60)
 
-#define UIN_MIN		(1000) // minimale eingangsspannung in 10*mV
+#define UIN_MIN		( 950) // minimale eingangsspannung in 10*mV
 #define UIN_MAX		(1700) // maximale eingangsspannung in 10*mv
 #define U_KURZSCHLUSS	UOUT2BITS(100)
 #define PWM_UMAX	(4091)

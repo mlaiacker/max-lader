@@ -32,19 +32,11 @@ void ladenSteuern(void)
 			charger.uSoll = (settings.param2);
 			charger.iMax = (settings.iMax);
 		} else
-		if(charger.mode==eModeLiPo) // Lipo Akkus Laden
+		if(charger.mode<MODE_LI_NUM) // Lipo Akkus Laden
 		{
-			if(charger.sekunden>=LIPO_TIME_MAX) charger.fertig = FERTIG_ZEIT;
-			charger.uSoll = (settings.param2*LIPO_UCELL_STOP);
-			if(impulsverz((charger.u < settings.param2*LIPO_UCELL_MIN) || (charger.u > settings.param2*(LIPO_UCELL_STOP+10)), 20, &charger.vError)) errorn = ERROR_ZELLEN;
-			charger.iMax = settings.iMax;
-			if( impulsverz( charger.i <= (settings.iMax>>3),100,&charger.vChange) ) charger.fertig = FERTIG_NORMAL;
-		} else
-		if(charger.mode==eModeLiFe) // LiFe Akkus Laden
-		{
-			if(charger.sekunden>=LIFE_TIME_MAX) charger.fertig = FERTIG_ZEIT;
-			charger.uSoll = (settings.param2*LIFE_UCELL_STOP);
-			if(impulsverz((charger.u < settings.param2*LIFE_UCELL_MIN) || (charger.u > settings.param2*(LIFE_UCELL_STOP+10)), 80, &charger.vError)) errorn = ERROR_ZELLEN;
+			if(charger.sekunden>=LI_TIME_MAX) charger.fertig = FERTIG_ZEIT;
+			charger.uSoll = (settings.param2*cell_stop[charger.mode]);
+			if(impulsverz((charger.u < settings.param2*cell_min[charger.mode]) || (charger.u > settings.param2*(cell_stop[charger.mode]+10)), 20, &charger.vError)) errorn = ERROR_ZELLEN;
 			charger.iMax = settings.iMax;
 			if( impulsverz( charger.i <= (settings.iMax>>3),100,&charger.vChange) ) charger.fertig = FERTIG_NORMAL;
 		} else
@@ -83,9 +75,7 @@ void ladenSteuern(void)
 //					if((((charger.dut <= NICA_DELTA_PEAK)&&(charger.mode==eModeNiCa))||((charger.dut <= NIMH_DELTA_PEAK)&&(charger.mode==eModeNiMh))) && (charger.ddutt>=charger.dut)) charger.fertig = FERTIG_DELTA_PEAK;
 					
 					if( charger.u >= charger.uMax ) charger.uMax += (charger.u-charger.uMax)/4;
-					if(impulsverz((charger.u-charger.uMax) <= -8,181,&charger.vDP)) charger.fertig = FERTIG_NORMAL;					
-						
-
+					if(impulsverz((charger.u-charger.uMax) <= -8,181,&charger.vDP)) charger.fertig = FERTIG_NORMAL;
 				}
 			}
 
@@ -110,7 +100,7 @@ void ladenSteuern(void)
 			charger.on=0;
 		}
 
-	} else // wenn das lden fertig ist, erhaltungsladung machen
+	} else // wenn das laden fertig ist, erhaltungsladung machen
 	if((regler.status!=REGLER_STATUS_OFF))
 	{
 		if((charger.mode == eModeNiCa) || (charger.mode == eModeNiMh))
@@ -180,7 +170,7 @@ void ladenSekunde(void)
 	if(charger.fertig == 0)
 	{
 		// uout wird am display angezeigt bei den Nixx modi wird der stromlose wert angezeigt, sonst die ausgangsspannung
-		if(charger.mode==eModeUI || charger.mode==eModeLiPo || charger.mode==eModeLiFe) 	charger.uOut = charger.u;
+		if(charger.mode==eModeUI || charger.mode<MODE_LI_NUM) 	charger.uOut = charger.u;
 		charger.sekunden++;
 		// geladenen amperstunden zählen, es wird in zwei stufen gearbeitet...
 		charger.c=BITS2COUT(regler.cOut);
