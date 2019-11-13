@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="6.5.0">
+<eagle version="7.7.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -14061,7 +14061,7 @@ USART&lt;p&gt;
 <pinref part="IC5" gate="G$1" pin="PC0(ADC0)"/>
 </segment>
 </net>
-<net name="N$15" class="0">
+<net name="BOOST_CTRL" class="0">
 <segment>
 <wire x1="93.98" y1="17.78" x2="93.98" y2="40.64" width="0.1524" layer="91"/>
 <wire x1="93.98" y1="17.78" x2="63.5" y2="17.78" width="0.1524" layer="91"/>
@@ -14270,7 +14270,7 @@ USART&lt;p&gt;
 <pinref part="C6" gate="G$1" pin="1"/>
 </segment>
 </net>
-<net name="N$1" class="0">
+<net name="INPUT_GATE" class="0">
 <segment>
 <wire x1="-17.78" y1="48.26" x2="-12.7" y2="48.26" width="0.1524" layer="91"/>
 <pinref part="R4" gate="G$1" pin="1"/>
@@ -14455,7 +14455,7 @@ USART&lt;p&gt;
 <pinref part="IC5" gate="G$1" pin="PC4(ADC4/SDA)"/>
 </segment>
 </net>
-<net name="N$10" class="0">
+<net name="BOOST_GATE" class="0">
 <segment>
 <wire x1="93.98" y1="53.34" x2="101.6" y2="53.34" width="0.1524" layer="91"/>
 <wire x1="93.98" y1="50.8" x2="93.98" y2="53.34" width="0.1524" layer="91"/>
@@ -14573,7 +14573,7 @@ USART&lt;p&gt;
 <pinref part="IC1" gate="G$1" pin="-IN"/>
 </segment>
 </net>
-<net name="N$4" class="0">
+<net name="BUCK_GATE" class="0">
 <segment>
 <wire x1="73.66" y1="78.74" x2="66.04" y2="78.74" width="0.1524" layer="91"/>
 <wire x1="66.04" y1="78.74" x2="66.04" y2="48.26" width="0.1524" layer="91"/>
@@ -14581,7 +14581,7 @@ USART&lt;p&gt;
 <pinref part="R17" gate="G$1" pin="2"/>
 </segment>
 </net>
-<net name="N$3" class="0">
+<net name="BUCK_CTRL" class="0">
 <segment>
 <wire x1="66.04" y1="38.1" x2="66.04" y2="22.86" width="0.1524" layer="91"/>
 <wire x1="66.04" y1="22.86" x2="63.5" y2="22.86" width="0.1524" layer="91"/>
