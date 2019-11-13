@@ -112,8 +112,8 @@
 
 #if defined (__AVR_ATmega168__)
 
-//#include "lcd.h"
-//#include "lcd.c"
+#include "lcd.h"
+#include "lcd.c"
 
 #define SIG2	0x94
 #define SIG3	0x06
@@ -292,8 +292,8 @@ int main(void)
 		putch('S');
 		putch('P');
 		putch(0x10);
-//	lcdInit();
-//	lcdPrint("MAX-Boot");
+	lcdInit();
+	lcdPrint("MAX-Boot");
 #endif
 
     /* forever loop */
@@ -434,12 +434,11 @@ int main(void)
 #endif
 			    {
 #if defined (__AVR_ATmega168__)
-//	lcdGotoY(1);
-//	lcdControlWrite(1<<LCD_DDRAM | (0x40));
-//	lcdDataWrite('w');
-//	lcdNum(address.word,5,0);
-//	lcdDataWrite('-');
-//	lcdNum(length.word,4,0);
+	lcdControlWrite(1<<LCD_DDRAM | (0x40));
+	lcdDataWrite('w');
+	lcdNum(address.word,5,0);
+	lcdDataWrite('-');
+	lcdNum(length.word,4,0);
 #endif
 				cli();					//Disable interrupts, just to be sure
 	//		    while(bit_is_set(EECR,EEWE));			//Wait for previous EEPROM writes to complete
