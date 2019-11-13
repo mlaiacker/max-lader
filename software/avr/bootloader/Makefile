@@ -8,8 +8,8 @@ BUILD      = 120515
 PROGRAM    = max-boot
 
 # enter the product name for which you want to build the bootloader/monitor
-PRODUCT    = MEGA8
-#PRODUCT    = MEGA168
+#PRODUCT    = MEGA8
+PRODUCT    = MEGA168
 #PRODUCT    = CRUMB8
 #PRODUCT    = CRUMB128
 #PRODUCT    = CRUMB168
@@ -27,7 +27,7 @@ AVR_FREQ   = F8000000
 # enter the parameters for the UISP isp tool
 # for an stk500 at com1
 ISPTOOL	   = stk500v2
-ISPPORT	   = com4
+ISPPORT	   = com10
 ISPSPEED   = -b 115200
 # or an stk200 at lpt1
 #ISPTOOL    = stk200
@@ -133,11 +133,15 @@ clean:
 lst:  $(PROGRAM).lst
 
 # Display size of file.
-sizebefore:
-	@if [ -f $(PROGRAM).elf ]; then echo; echo $(MSG_SIZE_BEFORE); $(ELFSIZE); echo; fi
+# Display size of file.
+sizebefore: $(PROGRAM).elf
+	@echo $(MSG_SIZE_BEFORE) 
+	@$(ELFSIZE)
 
-sizeafter:
-	@if [ -f $(PROGRAM).elf ]; then echo; echo $(MSG_SIZE_AFTER); $(ELFSIZE); echo; fi
+sizeafter: $(PROGRAM).elf
+	@echo $(MSG_SIZE_AFTER)
+	@$(ELFSIZE)
+
 
 
 %.lst: %.elf
