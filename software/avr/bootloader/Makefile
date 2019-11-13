@@ -27,7 +27,7 @@ AVR_FREQ   = F8000000
 # enter the parameters for the UISP isp tool
 # for an stk500 at com1
 ISPTOOL	   = stk500v2
-ISPPORT	   = com10
+ISPPORT	   = com4
 ISPSPEED   = -b 115200
 # or an stk200 at lpt1
 #ISPTOOL    = stk200
@@ -51,7 +51,7 @@ ifeq ($(PRODUCT),MEGA168)
 MCU_TARGET = atmega168
 LDSECTION  = --section-start=.text=0x3800
 #ISPFUSES    = avrdude -c $(ISPTOOL) -p m168 -P $(ISPPORT) $(ISPSPEED) -u -U efuse:r:-:h -U hfuse:r:-:h -U lfuse:r:-:h
-#ISPFUSES    = avrdude -c $(ISPTOOL) -p m168 -P $(ISPPORT) $(ISPSPEED) -u -U efuse:w:0x00:m -U hfuse:w:0xd4:m -U lfuse:w:0xd7:m
+ISPFUSES    = avrdude -c $(ISPTOOL) -p m168 -P $(ISPPORT) $(ISPSPEED) -u -U efuse:w:0xF8:m -U hfuse:w:0xd4:m -U lfuse:w:0xd7:m
 ISPFLASH    = avrdude -c $(ISPTOOL) -p m168 -P $(ISPPORT) $(ISPSPEED) -U flash:w:$(PROGRAM)_$(PRODUCT)_$(AVR_FREQ)_$(BUILD).hex
 endif
 
@@ -123,6 +123,14 @@ program: $(PROGRAM).hex
 	$(ISPFUSES)
 	$(ISPFLASH)
 
+program_all: 
+	@cat ../main_$(MCU_TARGET).hex | gawk '/^:00000001FF/ == 0' > $(PROGRAM)_main.hex
+	@cat $(PROGRAM).hex >> $(PROGRAM)_main.hex
+	cp $(PROGRAM)_main.hex $(PROGRAM)_$(PRODUCT)_$(AVR_FREQ)_$(BUILD).hex
+#	@$(AVR_SIZE) $@
+	$(ISPFUSES)
+	$(ISPFLASH)
+
 $(PROGRAM).elf: $(OBJ)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
@@ -133,14 +141,14 @@ clean:
 lst:  $(PROGRAM).lst
 
 # Display size of file.
-# Display size of file.
-sizebefore: $(PROGRAM).elf
+# Display size of file.$(PROGRAM).elf
+sizebefore: 
 	@echo $(MSG_SIZE_BEFORE) 
-	@$(ELFSIZE)
+	@if exist $(PROGRAM).elf ( @$(ELFSIZE) )
 
 sizeafter: $(PROGRAM).elf
 	@echo $(MSG_SIZE_AFTER)
-	@$(ELFSIZE)
+	@if exist $(PROGRAM).elf ( @$(ELFSIZE) )
 
 
 
