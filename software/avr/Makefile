@@ -139,12 +139,12 @@ LDFLAGS += -lm
 #
 #AVRDUDE_PROGRAMMER = jespers-original
 #AVRDUDE_PROGRAMMER = stk200
-#AVRDUDE_PROGRAMMER = stk500v1
-AVRDUDE_PROGRAMMER = stk500v2
+AVRDUDE_PROGRAMMER = stk500v1
+#AVRDUDE_PROGRAMMER = stk500v2
 
 
-#AVRDUDE_PORT = com1 -b 38400  # programmer connected to serial device
-AVRDUDE_PORT = com10 -b 115200  # programmer connected to serial device
+AVRDUDE_PORT = com1 -b 38400  # programmer connected to serial device
+#AVRDUDE_PORT = com10 -b 115200  # programmer connected to serial device
 #AVRDUDE_PORT = lpt1	# programmer connected to parallel port
 
 AVRDUDE_WRITE_FLASH = -U flash:w:$(TARGET).hex
@@ -256,13 +256,13 @@ end:
 
 
 # Display size of file.
-sizebefore: $(TARGET).elf
+sizebefore: 
 	@echo $(MSG_SIZE_BEFORE) 
-	@$(ELFSIZE)
+	@if exist $(TARGET).elf ( @$(ELFSIZE) )
 
-sizeafter: $(TARGET).elf
+sizeafter:
 	@echo $(MSG_SIZE_AFTER)
-	@$(ELFSIZE)
+	@if exist $(TARGET).elf ( @$(ELFSIZE) )
 
 
 
