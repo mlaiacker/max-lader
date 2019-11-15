@@ -57,6 +57,9 @@ void init(void){
 	#endif
 	lcdInit();
 
+	oscData.trigger_ch=254;
+	oscData.index = 0;
+
 // timer0 für Zeitmessung
 	Time=0;
 	// Counter Register
@@ -190,17 +193,42 @@ int balancer_parse(unsigned char c, t_balancer_state *state)
 }
 #endif
 
-
+u16 uart_data_send=0;
+u16 uart_busy=0;
+void uartOsc(void)
+{
+	if(oscData.trigger_ch==255 && uart_data_send==0 && uart_busy==0)
+	{
+		usartPutc(0xff);
+		usartPutc(0xaf);
+		usartPutc(0xbf);
+		uart_busy=1;
+	}
+	if(uart_busy && uart_data_send<sizeof(oscData))
+	{
+		usartPutc(((u08*)&oscData)[uart_data_send]);
+		uart_data_send++;
+	}
+	if(uart_data_send==sizeof(oscData) && uart_busy==1)
+	{
+		uart_busy = 0;
+		oscData.trigger_ch=254;
+		uart_data_send = 0;
+	}
+}
 
 void uartOutput(void)
 {
+	if(uart_busy) return;
 	//usart_puts_prog(modeName[charger.mode]);
 	usartNum(charger.sekunden,5,0); // Ladezeit
 	usartNum(charger.u,4,2); // Ausgangsspanung aktuell
 	usartNum(charger.i,4,3); // Ausgangsstrom
 	usartNum(charger.c,4,2); // geladene Kapazität
-	usartNum(charger.dut,0,0); // Spanungsänderung in mv/Minute
-	usartNum(charger.ddutt,0,0); // Änderung der Spannungsänderung in mv/Minute² 
+//	usartNum(charger.dut,0,0); // Spanungsänderung in mv/Minute
+//	usartNum(charger.ddutt,0,0); // Änderung der Spannungsänderung in mv/Minute²
+	usartNum(regler.error,0,0);
+	usartNum(regler.errorI,0,0);
 //	usartNum(regler.pwm<<5,3,0); // pwm zustand
 	usartNum(regler.uIn,4,2); // Eingangsspannung
 //	usartNum(charger.uMax,4,2); //Maximalspannung
@@ -295,7 +323,7 @@ int main(void)
 			ladenSekunde();
 			pwmreglerSekunde();
 		}
-
+		uartOsc();
 	}// for(ever) 
 }// main
 

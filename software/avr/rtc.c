@@ -16,7 +16,7 @@
   volatile unsigned short Time_us;
 #endif
 
-volatile t_Time Time;
+volatile t_Time Time; //< since start in ms
 
 /* wird vom interrupt aufgerufen */
 /*

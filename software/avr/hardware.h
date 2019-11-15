@@ -5,7 +5,7 @@
 #include "migration8-168.h"
 #endif
 
-#define LADER_VERSION	(16)
+#define LADER_VERSION	(17)
 
 #ifndef F_CPU
 	#if defined (__AVR_ATmega168__)
@@ -174,7 +174,7 @@
 #define PWM_DOWN_MAX	(255)
 #define PWM_UP_MAX		((PWM_MAX+PWM_DOWN_MAX)-PWM_MAX*3/10) // maximale pulsbreite für die UP stufe
 
-#define PWM_DIV	(32)
+#define PWM_DIV	(16)
 #define PWM_FULL_DOWN	((PWM_DOWN_MAX)*PWM_DIV)
 #define PWM_FULL_UP		((PWM_UP_MAX)*PWM_DIV)
 #define PWM2PROZENT(x)		(((x)/PWM_DIV)*10/51)
