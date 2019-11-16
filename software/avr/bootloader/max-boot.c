@@ -283,15 +283,6 @@ int main(void)
 //	UBRRL = 103; // 9600@16MHz
     UCSRB = _BV(TXEN)|_BV(RXEN);
 #if defined (__AVR_ATmega168__)
-		putch(0x14);
-		putch('A');
-		putch('V');
-		putch('R');
-		putch(' ');
-		putch('I');
-		putch('S');
-		putch('P');
-		putch(0x10);
 	lcdInit();
 	lcdPrint("MAX-Boot");
 #endif
@@ -301,9 +292,13 @@ int main(void)
 	{
 	/* get character from UART */
 	ch = getch();
+#if defined (__AVR_ATmega168__)
+	lcdControlWrite(1<<LCD_DDRAM | (0x40));
+	lcdDataWrite(ch);
+#endif
 	/* A bunch of if...else if... gives smaller code than switch...case ! */
 	/* Hello is anyone home ? */
-	if((ch=='0') || (ch=='P') || (ch=='Q') || (ch=='R') || (ch=='@'))
+	if((ch=='0') || (ch=='P') || (ch=='R') || (ch=='@'))
 	{
 	    nothing_response();
 	}
@@ -311,7 +306,8 @@ int main(void)
 	/* Request programmer ID */
 	/* Not using PROGMEM string due to boot block in m128 being beyond 64kB boundry  */
 	/* Would need to selectively manipulate RAMPZ, and it's only 9 characters anyway so who cares.  */
-/*	else if(ch=='1') {
+#if defined (__AVR_ATmega168__)
+	else if(ch=='1') {
 	    if (getch() == ' ') {
 		putch(0x14);
 		putch('A');
@@ -324,7 +320,7 @@ int main(void)
 		putch(0x10);
 	    }
 	}
-*/
+#endif
 	/* AVR ISP/STK500 board commands  DON'T CARE so default nothing_response */
 /*	else if(ch=='@') {
 	    ch2 = getch();
@@ -363,10 +359,10 @@ int main(void)
 //	}
 
 	/* Leave programming mode  */
-//	else if(ch=='Q') {
-//	    nothing_response();
-//	}
-
+	else if(ch=='Q') {
+	    nothing_response();
+	    app_start();
+	}
 	/* Erase device, don't care as we will erase one page at a time anyway.  */
 //	else if(ch=='R') {
 //	    nothing_response();
@@ -437,8 +433,6 @@ int main(void)
 	lcdControlWrite(1<<LCD_DDRAM | (0x40));
 	lcdDataWrite('w');
 	lcdNum(address.word,5,0);
-	lcdDataWrite('-');
-	lcdNum(length.word,4,0);
 #endif
 				cli();					//Disable interrupts, just to be sure
 	//		    while(bit_is_set(EECR,EEWE));			//Wait for previous EEPROM writes to complete

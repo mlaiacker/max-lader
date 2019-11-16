@@ -10,7 +10,19 @@
 #include "pwm.h"
 #include "a2d.h"
 
+/* pwm control parameter for current */
+#define I_KI	16
+#define I_KP	16
+#define I_KD	256
+
+/* pwm control parameter for voltage */
+#define U_KI	8
+#define U_KP	2
+#define U_KD	256
+
 tRegler regler;
+
+#if defined (__AVR_ATmega168__)
 
 osc_data_t oscData;
 
@@ -69,6 +81,10 @@ void oscSample(s16 ch1, s16 ch2, u16 dt, u08 trigger)
 	}
 
 }
+#else
+#define oscSample(a, b, c, d)
+#define oscReset(a,b,c)
+#endif
 
 void pwmregler(void)
 {
@@ -81,15 +97,6 @@ void pwmregler(void)
 		if((regler.uSoll == 0) || (regler.iMax == 0))// || (regler.uOut > PWM_UMAX))
 		{
 			regler.pwm = 0;
-/*			if(regler.iMax == 0)
-			{
-				if(charger.uSoll<=regler.uIn)
-				{
-				  // bei kleinen spannungen kommt etwa das doppelt der spannung raus wenn man
-				  // pwm vorsteuert, umso näher die spannung an die eingaspannung umso besser stimmt die rechnung
-				  regler.pwm =  (charger.uSoll/8*PWM_DIV/(regler.uIn/8))*255; // test der teorie
-				}
-			}*/
 		} else
 		{
 			if(regler.iOut>=IOUT_GRENZWERT)
@@ -100,47 +107,37 @@ void pwmregler(void)
 				}
 			}
 			div=((regler.iMax/(16)) + 1);
-			if( (((regler.iOut + div) >= regler.iMax) && (regler.uOut < regler.uSoll)) )
+			if( (((regler.iOut + div) >= regler.iMax) && (regler.uOut < regler.uSoll-1)) )
 			{
-#define I_KI	16
-#define I_KP	16
-#define I_KD	256
 				regler.error = (regler.iMax - regler.iOut) ; // strombegrenzung
 //				s16 errorD = regler.error - regler.error_last;
 				if((regler.pwm + regler.error/I_KI)<=PWM_FULL_UP && (regler.pwm + regler.error/I_KI)>=-PWM_DIV) // anti windup
 					regler.errorI += regler.error/I_KI;
 				regler.pwm = regler.error/I_KP + regler.errorI;// + errorD/I_KD;
 //				regler.error_last = regler.error;
-//				regler.pwm += regler.error;
 			} else
 			{
-#define KI	8
-#define KP	2
-#define KD	256
 				regler.error = (regler.uSoll - regler.uOut); // spannungsregelung
 				//s16 errorD = regler.error - regler.error_last;
-				if((regler.pwm + regler.error/KI)<=PWM_FULL_UP && (regler.pwm + regler.error/KI)>=-PWM_DIV) // anti windup
-					regler.errorI += regler.error/KI;
-				regler.pwm = regler.error/KP + regler.errorI;// + errorD/KD;
+				if((regler.pwm + regler.error/U_KI)<=PWM_FULL_UP && (regler.pwm + regler.error/U_KI)>=-PWM_DIV) // anti windup
+					regler.errorI += (regler.error-(U_KI-1))/U_KI;
+				regler.pwm = regler.error/U_KP + regler.errorI;// + errorD/KD;
 				//regler.error_last = regler.error;
-
-				//if(regler.error>0) regler.error /=(regler.uSoll/700+1);// spannung nicht grösser werden lassen als soll
 			}
-			//if(regler.error>2*PWM_DIV) regler.pwm += 2*PWM_DIV;
-			//else if(regler.error<-2*PWM_DIV) regler.pwm -= 2*PWM_DIV;	else
 		}
 	}
 	else
 	{
 		regler.pwm=0;
 		regler.errorI = 0;
-		regler.error_last = 0;
 	}
 	
 	oscSample(regler.uOut,regler.iOut,80,0);
-	if(regler.pwm>PWM_FULL_UP) regler.pwm = PWM_FULL_UP;
-	else 
-	if(regler.pwm<0) regler.pwm = 0;
+	if(regler.pwm>PWM_FULL_UP){
+		regler.pwm = PWM_FULL_UP;
+	}else if(regler.pwm<0){
+		regler.pwm = 0;
+	}
 	pwmSet(regler.pwm/PWM_DIV);
 }
 
@@ -152,21 +149,28 @@ void pwmregler(void)
 	if(errorn) return;
 	
 	regler.uIn = BITS2UIN(a2dAvg(UIN));
-	if((regler.uIn <= UIN_MIN)||(regler.uIn >= UIN_MAX))
+	/* check input voltage is outside range for 5 seconds */
+	if(impulsverz((regler.uIn <= UIN_MIN)||(regler.uIn >= UIN_MAX), 5, &regler.et_uin))
 	{
 		errorn = ERROR_EINGANGSSPANNUNG;
 	}
 	#ifdef TEMP_SENS
-	if(impulsverz(TEMP_KRITISCH(regler.temp),10,&regler.vTemp))
+	/* check temperature to high fo 10 seconds */
+	if(impulsverz(TEMP_KRITISCH(regler.temp),10,&regler.et_temperature))
 	{
 		errorn = ERROR_TEMP;
 	}
 	#endif
+	/* check if pwm controller error is too high */
+	if(impulsverz((regler.error >= REGLER_NORMAL*PWM_DIV) || (regler.error <= -REGLER_NORMAL*PWM_DIV)/* abs error to high */
+			|| (regler.pwm >= PWM_FULL_UP) /* overload */
+//			 ||(regler.pwm<PWM_DIV && regler.status==REGLER_STATUS_ON && regler.error !=0) /* pwm at zero but still error */
+			,REGLER_UNORMAL_GRENZ, &regler.et_unnormal)) errorn = ERROR_WANDLER;
 	
-	if(impulsverz((regler.error >= REGLER_NORMAL*PWM_DIV) || (regler.error <= -REGLER_NORMAL*PWM_DIV)||(regler.pwm >= PWM_FULL_UP),REGLER_UNORMAL_GRENZ,&regler.unnormal)) errorn = ERROR_WANDLER;
-	
+#if defined (__AVR_ATmega168__)
 	if(oscData.trigger_ch==254)
 	{
 		oscReset(2,3,regler.iMax*9/10+10);
 	}
+#endif
 }	

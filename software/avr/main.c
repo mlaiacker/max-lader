@@ -46,6 +46,8 @@ void init(void){
 //		UCSRB = 0x98;        // 1001 1000
                        // Receiver enabled, Transmitter enabled
                        // RX Complete interrupt enabled
+		oscData.trigger_ch=254;
+		oscData.index = 0;
 	#elif defined (__AVR_ATmega8__)
 		UBRRL = (uint8_t)(F_CPU/(UART_BAUD_RATE*8L)-1);
 		UBRRH = (F_CPU/(UART_BAUD_RATE*8L)-1) >> 8;
@@ -57,8 +59,6 @@ void init(void){
 	#endif
 	lcdInit();
 
-	oscData.trigger_ch=254;
-	oscData.index = 0;
 
 // timer0 für Zeitmessung
 	Time=0;
@@ -107,6 +107,8 @@ void init(void){
 		lcdPrint("   MAX-Lader16  ");
 	#elif defined (__AVR_ATmega8__)
 		lcdPrint("   MAX-Lader    ");
+	#else
+#error "not supported MCU"
 	#endif
 	lcdGotoY(1);
 	lcdPrint("Version:");
@@ -191,7 +193,6 @@ int balancer_parse(unsigned char c, t_balancer_state *state)
   }
   return 0;
 }
-#endif
 
 u16 uart_data_send=0;
 u16 uart_busy=0;
@@ -216,23 +217,26 @@ void uartOsc(void)
 		uart_data_send = 0;
 	}
 }
+#endif
 
 void uartOutput(void)
 {
+#if defined (__AVR_ATmega168__)
 	if(uart_busy) return;
+#endif
 	//usart_puts_prog(modeName[charger.mode]);
 	usartNum(charger.sekunden,5,0); // Ladezeit
 	usartNum(charger.u,4,2); // Ausgangsspanung aktuell
 	usartNum(charger.i,4,3); // Ausgangsstrom
 	usartNum(charger.c,4,2); // geladene Kapazität
-//	usartNum(charger.dut,0,0); // Spanungsänderung in mv/Minute
-//	usartNum(charger.ddutt,0,0); // Änderung der Spannungsänderung in mv/Minute²
-	usartNum(regler.error,0,0);
-	usartNum(regler.errorI,0,0);
-//	usartNum(regler.pwm<<5,3,0); // pwm zustand
+	usartNum(charger.dut,0,0); // Spanungsänderung in mv/Minute
+	usartNum(charger.ddutt,0,0); // Änderung der Spannungsänderung in mv/Minute²
+//	usartNum(regler.error,0,0);
+//	usartNum(regler.errorI,0,0);
+	usartNum(regler.pwm/PWM_DIV,0,0); // pwm zustand
 	usartNum(regler.uIn,4,2); // Eingangsspannung
 //	usartNum(charger.uMax,4,2); //Maximalspannung
-	usartNum(regler.temp,3,0); // "Temperatur" der Endstufe
+	usartNum(regler.temp,0,0); // "Temperatur" der Endstufe
 	usartNum(charger.uOut,4,2); // Ausgangsspanung stromlos
 #ifdef UOUT_LOW
 //	usartNum(charger.uOutLow,4,2); //Ausgangsspanung unterer Bereich
@@ -275,6 +279,7 @@ int main(void)
 	{
 		wdt_reset();
 #if defined (__AVR_ATmega168__)
+		uartOsc();
 		if(usart_unread_data()!=0)
 		{
 			if(balancer_parse(usart_getc(),&bstate))
@@ -323,7 +328,7 @@ int main(void)
 			ladenSekunde();
 			pwmreglerSekunde();
 		}
-		uartOsc();
+
 	}// for(ever) 
 }// main
 

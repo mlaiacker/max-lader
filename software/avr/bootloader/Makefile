@@ -19,9 +19,9 @@ PRODUCT    = MEGA168
 # enter the target CPU frequency
 #AVR_FREQ   = F3686400
 #AVR_FREQ   = F7372800
-AVR_FREQ   = F8000000
+#AVR_FREQ   = F8000000
 #AVR_FREQ   = F14745600
-#AVR_FREQ   = F16000000
+AVR_FREQ   = F16000000
 #AVR_FREQ   = F20000000
 
 # enter the parameters for the UISP isp tool
