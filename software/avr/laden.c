@@ -38,7 +38,7 @@ void ladenSteuern(void)
 			charger.uSoll = (settings.param2*cell_stop[charger.mode]);
 			if(impulsverz((charger.u < settings.param2*cell_min[charger.mode]) || (charger.u > settings.param2*(cell_stop[charger.mode]+10)), 20, &charger.vError)) errorn = ERROR_ZELLEN;
 			charger.iMax = settings.iMax;
-			if( impulsverz( charger.i <= (settings.iMax>>3),100,&charger.vChange) ) charger.fertig = FERTIG_NORMAL;
+			if( impulsverz( charger.i <= (settings.iMax>>3), 100, &charger.vChange) ) charger.fertig = FERTIG_NORMAL;
 		} else
 		if((charger.mode==eModeNiMh)||(charger.mode==eModeNiCa)) // NiCa und NiMh Akkus Laden
 		{
@@ -164,7 +164,7 @@ void ladenSekunde(void)
 		{
 			settings.iMax-=10;
 		}
-		charger.iOut = charger.i;
+		charger.iOut = (charger.iOut + charger.i*3)/4;
 	}
 	ladenSteuern();
 	if(charger.fertig == 0)
@@ -184,7 +184,7 @@ void laden(void)
 {
 	s16 tmp;
 
-	charger.i = BITS2IOUT(regler.iOut);
+	charger.i = (BITS2IOUT(regler.iOut) + charger.i*3)/4;
 	charger.u = BITS2UOUT(regler.uOut);
 	#ifdef UOUT_LOW
 	charger.uOutLow = BITS2UOUTL(a2dAvg(UOUT_LOW));
@@ -192,7 +192,8 @@ void laden(void)
 	if(charger.on)
 	{
 		// wenn der strom auf 0 sinkt wurde der akku abgezogen und die ladung wird beendet
-		if(impulsverz((charger.i <= IOUT_FERTIG) && (regler.iMax>0) && (charger.mode != eModeUI) && (!charger.messen) && (charger.sekunden>10),20,&charger.vAb))
+		if(impulsverz((charger.i <= IOUT_FERTIG) && (regler.iMax>0) && (charger.mode != eModeUI) && (!charger.messen) && (charger.sekunden>20),
+				40, &charger.vAb))
 		{
 			if(charger.fertig==0) charger.fertig = FERTIG_AKKU_AB;
 			regler.status=REGLER_STATUS_OFF;

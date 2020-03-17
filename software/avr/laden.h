@@ -22,7 +22,7 @@
 #define AKKU_DETECT_U	(400) //mV/10
 #define I_MESSEN		(2)	//bits
 
-#define LI_TIME_MAX	(3*60*60)	//sekunden
+#define LI_TIME_MAX		(4*60*60)	//sekunden
 
 #define LIPO_UCELL_STOP	(420)	//mV/10
 #define LIPO_UCELL_MIN	(280)	//mV/10

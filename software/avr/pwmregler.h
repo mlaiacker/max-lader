@@ -23,9 +23,9 @@ typedef struct
 {
 	s16 uSoll,iMax; // sollwete in bits
 	s16 pwm,uIn,uOut,iOut,temp; // messwete in bits
-	s16 n,freq,error,errorI;
+	s16 error,errorI;
 	u32 cOut; // ausgegebene kapazität
-	u08 status;
+	u08 status, current_active, mode;
 	u08 et_unnormal,et_uin, et_temperature; // error timer state
 } tRegler;
 
@@ -46,7 +46,7 @@ typedef struct
 extern osc_data_t oscData;
 #endif
 
-void oscReset(u08 trigger_ch, u08 edge, s16 trigger_level);
+void oscReset(u08 trigger_ch, u08 edge, s16 trigger_level,  u16 dt);
 
 void pwmregler(void);
 void pwmreglerSekunde(void);

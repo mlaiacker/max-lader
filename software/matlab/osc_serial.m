@@ -65,7 +65,7 @@ try
         end
         if parse_state==4
            [dt_us, len] = fread(s,1,'uint16');
-           dt_us
+           %dt_us
            if(len==0)
                if replay
                    break
@@ -118,9 +118,9 @@ try
            output_args = reshape(data,DATA_COUNT,2);
            output_args = output_args(new_index,:);
            time = (1:DATA_COUNT)*dt_us*1e-6;
-           plot(time,[output_args(:,1)*ch1_mult output_args(:,2)*ch2_mult],'+-')
+           plot(time,[output_args(:,1)*ch1_mult output_args(:,2)*ch2_mult ones(DATA_COUNT,1)*trigger_level*ch2_mult],'+-')
            grid on
-           legend('ch1','ch2')
+           legend('ch1','ch2','trigger')
            pause(0.5)
            if(len==0)
                if replay
