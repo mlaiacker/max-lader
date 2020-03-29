@@ -61,7 +61,7 @@ void lcdBusyWait(void)
 		for(i=0;i<4;i++)
 		{
 			if((i%2)==0) cbi(LCD_CTRL_E_PORT, LCD_CTRL_E);		// clear "E" line
-			if((i%2)==1) sbi(LCD_CTRL_E_PORT, LCD_CTRL_E);		// clear "E" line
+			if((i%2)==1) sbi(LCD_CTRL_E_PORT, LCD_CTRL_E);		// set "E" line
 			LCD_DELAY;									// wait
 			LCD_DELAY;									// wait
 		}
@@ -81,14 +81,14 @@ void lcdWrite(u08 type,u08 data)
 		LCD_DATA_DDR = LCD_DATA_DDR|0xF0;	// set data I/O lines to output (4bit)
 		LCD_DATA_POUT= (LCD_DATA_POUT&0x0F) | (data&0xF0) ;	// output data, high 4 bits
 		LCD_DELAY;								// wait
-		LCD_DELAY;								// wait
+//		LCD_DELAY;								// wait
 		cbi(LCD_CTRL_E_PORT, LCD_CTRL_E);	// clear "E" line
 		LCD_DELAY;								// wait
-		LCD_DELAY;								// wait
+//		LCD_DELAY;								// wait
 		sbi(LCD_CTRL_E_PORT, LCD_CTRL_E);	// set "E" line
 		LCD_DATA_POUT = (((LCD_DATA_POUT)&0x0F) | (data<<4) );	// output data, low 4 bits
 		LCD_DELAY;								// wait
-		LCD_DELAY;								// wait
+//		LCD_DELAY;								// wait
 		cbi(LCD_CTRL_E_PORT, LCD_CTRL_E);	// clear "E" line
 	//	leave data lines in input mode so they can be most easily used for other purposes
 		LCD_DATA_DDR = LCD_DATA_DDR&0x0F;		// set data I/O lines to input (4bit)

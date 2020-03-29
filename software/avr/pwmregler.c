@@ -93,10 +93,8 @@ void pwmregler(void)
 	regler.iOut = a2dAvg(IOUT);
 	regler.uOut = a2dAvg(UOUT) - U_SENS(regler.iOut);
 	regler.error = 0;
-	if((regler.status == REGLER_STATUS_ON) && (errorn==0)){
-		if((regler.uSoll == 0) || (regler.iMax == 0)){
-			regler.pwm = 0;
-		} else {
+	if((regler.status == REGLER_STATUS_ON) && (errorn==0) &&
+			(regler.uSoll > 0) && (regler.iMax > 0)){
 			if(regler.iOut>=IOUT_GRENZWERT)
 			{
 				if(regler.uOut <= U_KURZSCHLUSS) {
@@ -133,14 +131,14 @@ void pwmregler(void)
 				regler.pwm = regler.error/I_KP + regler.errorI;
 			} else {
 				regler.error = error_u; // spannungsregelung
-				if((regler.pwm + regler.error/U_KI)<=PWM_FULL_UP && (regler.pwm + regler.error/U_KI)>=-PWM_DIV) // anti windup
-					regler.errorI += (regler.error)/U_KI;
+				s16 changeU = regler.error/U_KI;
+				if((regler.pwm + changeU)<=PWM_FULL_UP && (regler.pwm + changeU)>=-PWM_DIV) // anti windup
+					regler.errorI += changeU;
 				if((regler.uOut-1) > regler.uSoll && regler.errorI>0){
 					regler.errorI--; // prevent over voltage
 				}
 				regler.pwm = regler.error/U_KP + regler.errorI;
 			}
-		}
 	} else {
 		regler.pwm=0;
 		regler.errorI = 0;

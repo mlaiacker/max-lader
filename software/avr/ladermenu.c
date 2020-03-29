@@ -182,9 +182,13 @@ void showParam2(void)
 	{
 		lcdPrint("Zellen=");
 		lcdNum(settings.param2,1,0);
+#if defined (__AVR_ATmega168__)
 		lcdPrintSpaces(2);
 		lcdNum(settings.param2*cell_stop[charger.mode]/10,4,1);
 		lcdDataWrite('V');
+#else
+		lcdPrintSpaces(6);
+#endif
 	} else
 	if(charger.mode==eModeNiMh||charger.mode==eModeNiCa)
 	{
