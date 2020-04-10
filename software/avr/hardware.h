@@ -5,7 +5,7 @@
 #include "migration8-168.h"
 #endif
 
-#define LADER_VERSION	(18)
+#define LADER_VERSION	(19)
 
 #ifndef F_CPU
 	#if defined (__AVR_ATmega168__)
@@ -205,6 +205,7 @@
 /* ### uart ### */
 #define UART // wir machen Ausgaben über die serielle Schnittstelle
 #if defined (__AVR_ATmega168__)
+//	#define DEBUG_OSC
 
 	#define UART_BAUD_RATE	9600
 //	#define UART_BAUD_RATE	115200

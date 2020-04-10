@@ -36,7 +36,11 @@ void init(void){
 	BEEP_INIT;
 	#endif
 	
-	#ifdef UART
+#ifdef UART
+#ifdef DEBUG_OSC
+	oscData.trigger_ch=254;
+	oscData.index = 0;
+#endif
 // Serielle Schnittstelle intalisieren
 	#if defined (__AVR_ATmega168__)
 		UBRRL = (uint8_t)(F_CPU/(UART_BAUD_RATE*8L)-1);
@@ -46,8 +50,6 @@ void init(void){
 //		UCSRB = 0x98;        // 1001 1000
                        // Receiver enabled, Transmitter enabled
                        // RX Complete interrupt enabled
-		oscData.trigger_ch=254;
-		oscData.index = 0;
 	#elif defined (__AVR_ATmega8__)
 		UBRRL = (uint8_t)(F_CPU/(UART_BAUD_RATE*8L)-1);
 		UBRRH = (F_CPU/(UART_BAUD_RATE*8L)-1) >> 8;
@@ -193,7 +195,8 @@ int balancer_parse(unsigned char c, t_balancer_state *state)
   }
   return 0;
 }
-
+#endif
+#ifdef DEBUG_OSC
 u16 uart_data_send=0;
 u16 uart_busy=0;
 void uartOsc(void)
@@ -221,7 +224,7 @@ void uartOsc(void)
 
 void uartOutput(void)
 {
-#if defined (__AVR_ATmega168__)
+#ifdef DEBUG_OSC
 	if(uart_busy) return;
 #endif
 	//usart_puts_prog(modeName[charger.mode]);
@@ -279,7 +282,9 @@ int main(void)
 	{
 		wdt_reset();
 #if defined (__AVR_ATmega168__)
+#ifdef DEBUG_OSC
 		uartOsc();
+#endif
 		if(usart_unread_data()!=0)
 		{
 			if(balancer_parse(usart_getc(),&bstate))

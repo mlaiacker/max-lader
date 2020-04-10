@@ -31,7 +31,7 @@ typedef struct
 
 extern tRegler regler;
 
-#if defined (__AVR_ATmega168__)
+#ifdef DEBUG_OSC
 #define OSC_COUNT	120
 typedef struct
 {

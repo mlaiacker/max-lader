@@ -22,7 +22,7 @@
 
 tRegler regler;
 
-#if defined (__AVR_ATmega168__)
+#ifdef DEBUG_OSC
 
 osc_data_t oscData;
 
@@ -183,7 +183,7 @@ void pwmreglerSekunde(void)
 //			 ||(regler.pwm<PWM_DIV && regler.status==REGLER_STATUS_ON && regler.error !=0) /* pwm at zero but still error */
 			,REGLER_UNORMAL_GRENZ, &regler.et_unnormal)) errorn = ERROR_WANDLER;
 	
-#if defined (__AVR_ATmega168__)
+#ifdef DEBUG_OSC
 	if(oscData.trigger_ch==254)
 	{
 		oscReset(2,3,regler.iMax*9/10+10, 80); // trigger on current
