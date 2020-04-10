@@ -14,6 +14,13 @@ end
 
 parse_state = 1;
 DATA_COUNT = 120;
+data_line = '';
+try 
+    data_charge = evalin('base', 'data_charge');
+catch ME
+    data_charge = NaN(3,1000);
+end
+charge_index = 1;
 try
     while parse_state ~= 0
         if parse_state==1
@@ -29,6 +36,26 @@ try
                 parse_state=2;
            else
              fprintf('%c', line);
+             data_line = [data_line line];
+             if(line==10)
+                 try
+                 fields = sscanf(data_line,'%d %f %f %f %d %d %d %f %d %f');
+                 if(length(fields)==10)
+                     data_charge(:,int16(mod(fields(1),1000))) = [fields(2) fields(3) fields(10)];
+                     if(int16(mod(fields(1),10))==0)
+                         figure(2); 
+                         subplot(2,1,1);plot(data_charge([1 3],:)');
+                         grid on;
+                         subplot(2,1,2);plot(data_charge(2,:)');
+                         grid on;
+                         pause(0.2)
+                     end
+                     assignin('base', 'data_charge', data_charge);
+                 end
+                 catch
+                 end
+                 data_line = '';
+             end
            end
         end
         if parse_state==2
@@ -118,6 +145,7 @@ try
            output_args = reshape(data,DATA_COUNT,2);
            output_args = output_args(new_index,:);
            time = (1:DATA_COUNT)*dt_us*1e-6;
+           figure(1);
            plot(time,[output_args(:,1)*ch1_mult output_args(:,2)*ch2_mult ones(DATA_COUNT,1)*trigger_level*ch2_mult],'+-')
            grid on
            legend('ch1','ch2','trigger')

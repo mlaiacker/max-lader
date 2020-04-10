@@ -31,7 +31,7 @@
 
 
 # MCU name
-MCU = atmega8
+MCU = atmega168
 AVRDUDE_PORT = com1 -b 38400  # programmer connected to serial device
 
 # Output format. (can be srec, ihex, binary)

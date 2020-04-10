@@ -19,7 +19,7 @@
 #define TIME_MAX		(60*60*8)	//8 stunden
 
 #define IOUT_FERTIG		(6)	//mA
-#define AKKU_DETECT_U	(400) //mV/10
+#define AKKU_DETECT_U	(200) //mV/10
 #define I_MESSEN		(2)	//bits
 
 #define LI_TIME_MAX		(4*60*60)	//sekunden
@@ -81,7 +81,7 @@ typedef struct
 {
 	u08 on,fertig,phase,ctmp,beep,bufIndex,uDetect,messen;
 	u16	sekunden,sekStromaenderung;
-	u08 vChange,vError,vDP,vAb; // verzögerungen
+	u08 vChange,vError,vDP,vAb; // Verzögerungen
 	s16 dut,ddutt,c,uOutTmp,uOut,iOut,i,uMax,pOut;
 	u16 uSoll,iMax;
 #ifdef UOUT_LOW
