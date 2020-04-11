@@ -207,8 +207,8 @@
 #if defined (__AVR_ATmega168__)
 //	#define DEBUG_OSC
 
-	#define UART_BAUD_RATE	9600
-//	#define UART_BAUD_RATE	115200
+//	#define UART_BAUD_RATE	9600
+	#define UART_BAUD_RATE	38400
 // Baudrate
 #elif defined (__AVR_ATmega8__)
 	#define UART_BAUD_RATE	9600

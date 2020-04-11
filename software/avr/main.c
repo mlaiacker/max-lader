@@ -43,6 +43,7 @@ void init(void){
 #endif
 // Serielle Schnittstelle intalisieren
 	#if defined (__AVR_ATmega168__)
+		wdt_disable();
 		UBRRL = (uint8_t)(F_CPU/(UART_BAUD_RATE*8L)-1);
 		UBRRH = (F_CPU/(UART_BAUD_RATE*8L)-1) >> 8;
 		UCSR0A = _BV(U2X0);
@@ -115,9 +116,9 @@ void init(void){
 	lcdGotoY(1);
 	lcdPrint("Version:");
 	lcdNum(LADER_VERSION,2,1);
-	rtcDelay(1000);
+	rtcDelay(900);
 	BEEP_OFF;
-	rtcDelay(1000);
+	rtcDelay(900);
 
 // zu letzt gewählten lade modus aus dem eeprom lesen
 	charger.mode = eeprom_read_byte(&eeChargeMode);
@@ -227,23 +228,16 @@ void uartOutput(void)
 #ifdef DEBUG_OSC
 	if(uart_busy) return;
 #endif
-	//usart_puts_prog(modeName[charger.mode]);
 	usartNum(charger.sekunden,5,0); // Ladezeit
 	usartNum(charger.u,4,2); // Ausgangsspanung aktuell
 	usartNum(charger.i,4,3); // Ausgangsstrom
 	usartNum(charger.c,4,2); // geladene Kapazität
 	usartNum(charger.dut,0,0); // Spanungsänderung in mv/Minute
 	usartNum(charger.ddutt,0,0); // Änderung der Spannungsänderung in mv/Minute²
-//	usartNum(regler.error,0,0);
-//	usartNum(regler.errorI,0,0);
 	usartNum(regler.pwm/PWM_DIV,0,0); // pwm zustand
 	usartNum(regler.uIn,4,2); // Eingangsspannung
-//	usartNum(charger.uMax,4,2); //Maximalspannung
 	usartNum(regler.temp,0,0); // "Temperatur" der Endstufe
 	usartNum(charger.uOut,4,2); // Ausgangsspanung stromlos
-#ifdef UOUT_LOW
-//	usartNum(charger.uOutLow,4,2); //Ausgangsspanung unterer Bereich
-#endif
 	usartPutc('\r');
 	usartPutc('\n');
 }
@@ -271,8 +265,11 @@ ISR(TIMER0_OVF_vect)
 int main(void)
 {
 #if defined (__AVR_ATmega168__)
+    MCUSR = 0;
 	t_balancer_state	bstate;
-	int i;
+	u08 stk500v1_parse = 0;
+	wdt_reset();
+	wdt_disable();
 #endif
 	init();
 	// watchdog einschalten
@@ -287,17 +284,30 @@ int main(void)
 #endif
 		if(usart_unread_data()!=0)
 		{
-			if(balancer_parse(usart_getc(),&bstate))
+			u08 c = usart_getc();
+			if(balancer_parse(c,&bstate))
 			{
 				memcpy(&bdata, &(bstate.data), sizeof(bdata));
 				if(bdata.cells!=0)
 				{
 					cell_avg = 0;
-					for(i=0;i<bdata.cells;i++)
+					for(u08 i=0;i<bdata.cells;i++)
 					{
 						cell_avg += bdata.mv[i];
 					}
 					cell_avg /= bdata.cells;
+				}
+			}
+			if(regler.status!=REGLER_STATUS_ON)
+			{
+				if(stk500v1_parse==0){
+					if((c=='1') || (c=='u') || (c=='0')) stk500v1_parse++;
+				} else
+				if(stk500v1_parse==1){
+					if(c==' '){
+						rtcDelay(1500); // wait for WDT to reset MCU
+					}
+					stk500v1_parse = 0;
 				}
 			}
 		}
@@ -305,21 +315,6 @@ int main(void)
 		if(maindata.tDisplay <= Time)
 		{
 			laden();
-			if(regler.status == REGLER_STATUS_ON)
-			{
-				regler.cOut += charger.i;
-			}
-			readTaste(&tasteL,TASTE_L);
-			readTaste(&tasteM,TASTE_M);
-			readTaste(&tasteR,TASTE_R);
-			#ifdef BEEP_ON
-			if( (charger.beep%2 == 1) && charger.on) BEEP_ON; else BEEP_OFF;
-			if(errorn)
-			{
-				if(charger.beep<BEEP_ERROR_COUNT*2) charger.beep++;
-			}
-//			if(TASTE_FP(tasteL)||TASTE_FP(tasteM)||TASTE_FP(tasteR)) BEEP_ON;
-			#endif
 			showMenu();
 			maindata.tDisplay += MENU_DISPLAY_INT;
 		}

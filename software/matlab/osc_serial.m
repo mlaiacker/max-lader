@@ -2,7 +2,7 @@ function [ output_args ] = osc_serial(port,ch1_mult,ch2_mult)
 
 if(strncmp(port,'COM',3)==1)
     instrreset;
-    s = serial(port,'BaudRate',9600,'DataBits',8);
+    s = serial(port,'BaudRate',38400,'DataBits',8);
     s.InputBufferSize = 512;
     s.Timeout = 0.001;
     fopen(s);

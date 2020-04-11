@@ -24,7 +24,6 @@ typedef struct
 	s16 uSoll,iMax; // sollwete in bits
 	s16 pwm,uIn,uOut,iOut,temp; // messwete in bits
 	s16 error,errorI;
-	u32 cOut; // ausgegebene kapazität
 	u08 status, current_active, mode;
 	u08 et_unnormal,et_uin, et_temperature; // error timer state
 } tRegler;
@@ -44,12 +43,14 @@ typedef struct
 	s16 data[2][OSC_COUNT];
 }osc_data_t;
 extern osc_data_t oscData;
+void oscReset(u08 trigger_ch, u08 edge, s16 trigger_level,  u16 dt);
 #endif
 
-void oscReset(u08 trigger_ch, u08 edge, s16 trigger_level,  u16 dt);
 
+/* is called from ADC interrupt every 80us */
 void pwmregler(void);
+
+/* must be called every second */
 void pwmreglerSekunde(void);
-void pwmreglerCOut(void);
 
 #endif

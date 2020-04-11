@@ -16,7 +16,6 @@
 
 tCharger charger;
 
-
 void ladenSteuern(void) // called every second
 {
 	if((!charger.on) || (errorn!=0))
@@ -25,19 +24,24 @@ void ladenSteuern(void) // called every second
 	} else
 	if(!charger.fertig)
 	{
-		if(charger.sekunden>=TIME_MAX) errorn = ERROR_ZEIT;
+		if(charger.sekunden>TIME_MAX) errorn = ERROR_ZEIT;
 		
 		if(charger.mode==eModeUI)
 		{
-			charger.uSoll = (settings.param2);
-			charger.iMax = (settings.iMax);
+			charger.uSoll = settings.param2;
+			charger.iMax = settings.iMax;
 		} else if(charger.mode<MODE_LI_NUM) // Lipo Akkus Laden
 		{
-			if(charger.sekunden>=LI_TIME_MAX) charger.fertig = FERTIG_ZEIT;
-			charger.uSoll = (settings.param2*cell_stop[charger.mode]);
-			if(impulsverz((charger.u < settings.param2*cell_min[charger.mode]) || (charger.u > settings.param2*(cell_stop[charger.mode]+10)), 20, &charger.vError)) errorn = ERROR_ZELLEN;
+			// check for timeout
+			if(charger.sekunden>LI_TIME_MAX) charger.fertig = FERTIG_ZEIT;
+			// set charge voltage
+			charger.uSoll = settings.param2*cell_stop[charger.mode];
+			// check for wrong cell count setting based on min and max cell voltage
+			if(impulsverz((charger.u < settings.param2*cell_min[charger.mode]) || (charger.u > (charger.uSoll+30)), 20, &charger.vError)) errorn = ERROR_ZELLEN;
+			// set charge current
 			charger.iMax = settings.iMax;
-			if( impulsverz( charger.i <= (settings.iMax>>4), 180, &charger.vChange) ) charger.fertig = FERTIG_NORMAL;
+			// charge current is low (1/16 of charge current) for 3 minutes -> charging finished
+			if( impulsverz(charger.i <= (settings.iMax>>4), 180, &charger.vChange) ) charger.fertig = FERTIG_NORMAL;
 		} else if((charger.mode==eModeNiMh)||(charger.mode==eModeNiCa)) // NiCa und NiMh Akkus Laden
 		{
 			if((charger.sekunden%60==10))
@@ -72,14 +76,14 @@ void ladenSteuern(void) // called every second
 					}
 //					if((((charger.dut <= NICA_DELTA_PEAK)&&(charger.mode==eModeNiCa))||((charger.dut <= NIMH_DELTA_PEAK)&&(charger.mode==eModeNiMh))) && (charger.ddutt>=charger.dut)) charger.fertig = FERTIG_DELTA_PEAK;
 					
-					if( charger.u >= charger.uMax ) charger.uMax += (charger.u-charger.uMax)>>2;
-					if(impulsverz((charger.u-charger.uMax) <= -8,181,&charger.vDP)) charger.fertig = FERTIG_NORMAL;
+					if( charger.uOut > charger.uMax ) charger.uMax = charger.uOut;
+					if(impulsverz((charger.uOut-charger.uMax) <= -8, 181, &charger.vDP)) charger.fertig = FERTIG_NORMAL;
 				}
 			}
 		}else if(charger.mode==eModePB) // Bleiakkus
 		{
-			charger.uSoll = (settings.param2*PB_UCELL_STOP);
-			charger.iMax = (settings.iMax);
+			charger.uSoll = settings.param2*PB_UCELL_STOP;
+			charger.iMax = settings.iMax;
 //			if(impulsverz((charger.i<PB_I_FERTIG) && (charger.u>=(charger.uSoll-3)), 200, &charger.vChange))
 			if(impulsverz((charger.i<PB_I_FERTIG), 200, &charger.vChange))
 			{
@@ -97,7 +101,7 @@ void ladenSteuern(void) // called every second
 		}
 
 	} else // wenn das Laden fertig ist, Erhaltungsladung aktiv
-	if((regler.status!=REGLER_STATUS_OFF))
+	if(regler.status!=REGLER_STATUS_OFF)
 	{
 		if((charger.mode == eModeNiCa) || (charger.mode == eModeNiMh))
 		{
@@ -127,9 +131,7 @@ void ladenOn(void)
 	BEEP_ON;
 	memset(&charger,0,sizeof(charger)-4);
 	charger.on = 1;
-	charger.uOutTmp = 0;
 	charger.uOut = charger.u;
-	regler.cOut = 0;
 	if(menu.changed)
 	{
 		menu.changed = 0;
@@ -141,7 +143,6 @@ void ladenOn(void)
 
 void ladenSekunde(void)
 {
-	//u16 tmp;
 	// spannung ist unter 1 volt gefallen also kann einen neuer akku erkannt werden
 	if(charger.u < (AKKU_DETECT_U/2)) charger.uDetect = 1;
 	// laden automatisch starten
@@ -158,7 +159,7 @@ void ladenSekunde(void)
 		//ausgangsleistung verringern wenn zu heiss geworden
 		if((/*(charger.pOut>P_MAX)||*/(TEMP_KRITISCH(regler.temp-5)))&&(settings.iMax>50))
 		{
-			settings.iMax-=10;
+			settings.iMax-=10; // reduce load
 		}
 		charger.iOut = (charger.iOut + charger.i*3)>>2;
 	}
@@ -166,56 +167,58 @@ void ladenSekunde(void)
 	if(charger.fertig == 0)
 	{
 		// uout wird am display angezeigt bei den Nixx modi wird der stromlose wert angezeigt, sonst die ausgangsspannung
-		if(charger.mode==eModeUI || charger.mode<MODE_LI_NUM) 	charger.uOut = charger.u;
+		if(charger.mode==eModeUI || charger.mode<MODE_LI_NUM){
+			charger.uOut = (charger.uOut + charger.u)>>1; // average of two measurements
+		}
 		charger.sekunden++;
 		// geladenen amperstunden zählen, es wird in zwei stufen gearbeitet...
-		charger.c = BITS2COUT(regler.cOut);
+		charger.c = BITS2COUT(charger.cOut);
 	} else
 	{// wenn laden fertig dann rumpiepen
 		if((charger.beep<BEEP_LADEN_COUNT*2) && charger.on) charger.beep++;
 	}
 }
-
+/* called every 50ms */
 void laden(void)
 {
-	s16 tmp;
-
 	charger.i = (BITS2IOUT(regler.iOut) + charger.i*3)>>2;
 	charger.u = (BITS2UOUT(regler.uOut) + charger.u*3)>>2;
+
 	#ifdef UOUT_LOW
 	charger.uOutLow = BITS2UOUTL(a2dAvg(UOUT_LOW));
 	#endif
 	if(charger.on)
 	{
+		charger.cOut += charger.i; // integrate charge current
 		// wenn der strom auf 0 sinkt wurde der akku abgezogen und die ladung wird beendet
 		if(impulsverz((charger.i <= IOUT_FERTIG) && (regler.iMax>0) && (charger.mode != eModeUI) && (!charger.messen) && (charger.sekunden>60),
-				40, &charger.vAb))
+				80, &charger.vAb))
 		{
 			if(charger.fertig==0) charger.fertig = FERTIG_AKKU_AB;
 			regler.status=REGLER_STATUS_OFF;
 		}
 		regler.iMax = IOUT2BITS(charger.iMax);
 		// wenn gemessen werden soll, sollstrom auf 0 setzen
-		if((charger.messen) && (charger.mode<=eModePB))
+		if(charger.messen)
 		{
 			regler.iMax = 0;
-		}
-
-// stromlose messung der akku spannung
-		if((charger.messen) && (regler.iOut<=I_MESSEN))
-		{ 
-			charger.uOut = charger.u;
-			#ifdef UOUT_LOW
-			if(charger.u<UOUT_LOW_AKTIV) charger.uOut=charger.uOutLow;
-			#endif
-			tmp = (charger.dut + (charger.uOut - charger.uOutTmp)*10)/2;
-			if(charger.uOutTmp!=0)
+			// stromlose messung der akku spannung
+			if(charger.i<=I_MESSEN)
 			{
-				charger.ddutt = tmp - charger.dut; // zweite ableitung u''(t) = u'(t) - u'(t-1)
-				charger.dut = tmp; // erste ableitung der spannung u'(t) = u(t) - u(t-1)
+				s16 tmp;
+				charger.uOut = charger.u;
+				#ifdef UOUT_LOW
+				if(charger.u<UOUT_LOW_AKTIV) charger.uOut = charger.uOutLow;
+				#endif
+				tmp = (charger.dut + (charger.uOut - charger.uOutTmp)*10)/2; // average of two measurements (mv/minute)
+				if(charger.uOutTmp!=0)
+				{
+					charger.ddutt = tmp - charger.dut; // zweite ableitung u''(t) = u'(t) - u'(t-1)
+					charger.dut = tmp; // erste ableitung der spannung u'(t) = u(t) - u(t-1)
+				}
+				charger.uOutTmp = charger.uOut; /* save for next measurement */
+				charger.messen = 0; /* done */
 			}
-			charger.messen=0;
-			charger.uOutTmp = charger.uOut;
-		} 
+		}
 	}
 }

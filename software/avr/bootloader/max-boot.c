@@ -57,7 +57,7 @@
 #include <avr/io.h>
 #include <avr/pgmspace.h>
 #include <avr/interrupt.h>
-//#include <avr/wdt.h>
+#include <avr/wdt.h>
 //#include <avr/eeprom.h>
 #include "../migration8-168.h"
 
@@ -215,7 +215,11 @@ void putch(char ch)
 char getch(void)
 {
     /* m8,16,32,169,8515,8535,163 */
+#if defined (__AVR_ATmega168__)
+    while(!(UCSRA & _BV(RXC))) wdt_reset();
+#else
     while(!(UCSRA & _BV(RXC)));
+#endif
     return UDR;
 }
 
@@ -251,9 +255,6 @@ void (*app_start)(void) = 0x0000;
 /* main program starts here */
 int main(void)
 {
-    uint8_t ch;
-    uint16_t w;
-
     asm volatile("nop\n\t");
 
     /* set pin direction for bootloader pin */
@@ -262,7 +263,12 @@ int main(void)
 
     /* check if flash is programmed already, if not start bootloader anyway */
 #if defined (__AVR_ATmega168__)
-    if(pgm_read_byte_near(0x0000) != 0xFF)
+    uint8_t mcusr_mirror = MCUSR;
+    MCUSR = 0;
+	wdt_disable();
+    if(pgm_read_byte_near(0x0000) != 0xFF &&
+    		(!(UCSRA & _BV(RXC))) && // or we have serial data
+			!(mcusr_mirror & (1<<WDRF))) // wdt rest
 #endif
     {
 	/* check if bootloader pin is set high */
@@ -271,6 +277,8 @@ int main(void)
            app_start();
         }
     }
+    uint8_t ch;
+    uint16_t w;
 
 #ifdef LED
     LED_DDR |= _BV(LED);

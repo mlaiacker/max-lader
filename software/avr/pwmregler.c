@@ -93,16 +93,13 @@ void pwmregler(void)
 	regler.iOut = a2dAvg(IOUT);
 	regler.uOut = a2dAvg(UOUT) - U_SENS(regler.iOut);
 	regler.error = 0;
-	if((regler.status == REGLER_STATUS_ON) && (errorn==0) &&
-			(regler.uSoll > 0) && (regler.iMax > 0)){
-			if(regler.iOut>=IOUT_GRENZWERT)
-			{
-				if(regler.uOut <= U_KURZSCHLUSS) {
+	if((regler.status == REGLER_STATUS_ON) && (errorn==0) && (regler.uSoll > 0)){
+			if((regler.iOut>=IOUT_GRENZWERT) && (regler.uOut <= U_KURZSCHLUSS)) {
 					errorn = ERROR_KURZSCHLUSS;
 					regler.pwm =0;
 					trigger = 1;
-				}
 			}
+
 			div=((regler.iMax/(16)) + 1);
 			if((regler.iOut + div) >= regler.iMax && regler.current_active<CONTROL_HIST){
 				regler.current_active++;
@@ -126,17 +123,26 @@ void pwmregler(void)
 				if(error_u<0)
 					regler.error += error_u*2;
 				s16 changeI = regler.error/I_KI;
+				if(changeI==0){
+					if(regler.error>0) changeI=1;
+					if(regler.error<0) changeI=-1;
+				}
 				if((regler.pwm + changeI)<=PWM_FULL_UP && (regler.pwm + changeI)>=-PWM_DIV) // anti windup
 					regler.errorI += changeI;
 				regler.pwm = regler.error/I_KP + regler.errorI;
+				if(regler.iMax==0)  regler.pwm=0;
 			} else {
 				regler.error = error_u; // spannungsregelung
 				s16 changeU = regler.error/U_KI;
+				if(changeU==0){
+					if(regler.error>0) changeU = 1;
+					if(regler.error<0) changeU = -1;
+				}
 				if((regler.pwm + changeU)<=PWM_FULL_UP && (regler.pwm + changeU)>=-PWM_DIV) // anti windup
 					regler.errorI += changeU;
-				if((regler.uOut-1) > regler.uSoll && regler.errorI>0){
+/*				if((regler.uOut-1) > regler.uSoll && regler.errorI>0){
 					regler.errorI--; // prevent over voltage
-				}
+				}*/
 				regler.pwm = regler.error/U_KP + regler.errorI;
 			}
 	} else {

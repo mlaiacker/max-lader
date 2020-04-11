@@ -42,7 +42,7 @@
 #define NICA_DELTA_PEAK			(-60)
 #define NIMH_DELTA_PEAK			(-40)
 #define NICA_WENDE_PUNKT		(100)
-#define NICA_I_TICKLE	(BITS2IOUT(20)) //mA
+#define NICA_I_TICKLE			(20) //mA
 
 #define PB_UCELL		(200)	//mV/10
 #define PB_UCELL_STOP	(240)	//mV/10
@@ -76,19 +76,22 @@ typedef enum
 #define MODE_NUM	(eModeEnde) // Anzahl der Lademodi
 #define MODE_LI_NUM	(eModeNiMh) // Anzahl der Lipo Lademodi
 
-#define CHARGER_BUF_LEN	(2)
 typedef struct 
 {
 	u08 on,fertig,phase,ctmp,beep,bufIndex,uDetect,messen;
-	u16	sekunden,sekStromaenderung;
 	u08 vChange,vError,vDP,vAb; // Verzögerungen
-	s16 dut,ddutt,c,uOutTmp,uOut,iOut,i,uMax,pOut;
-	u16 uSoll,iMax;
+	u16	sekunden,sekStromaenderung;
+	s16 dut,ddutt,c;
+	s16 uOutTmp, uOut; ///> voltage in 10mv steps
+	s16 i, iOut,uMax; ///> current in mA
+	u16 uSoll; ///> desired output voltage in 10mv steps
+	u16 iMax; ///> max output current in mA
+	u32 cOut; // ausgegebene kapazität
 #ifdef UOUT_LOW
 	s16 uOutLow;
 #endif
-	s16 mode;
-	s16 u;
+	s16 mode; //> has to bee at the end (last 4 bytes) of struct
+	s16 u; ///> voltage in 10mv steps
 } tCharger;
 
 
@@ -117,10 +120,16 @@ t_balancer_data bdata;
 
 extern tCharger charger;
 
+/* must be called every MENU_DISPLAY_INT ms */
 void laden(void);
+
+/* must be called every second */
 void ladenSekunde(void);
-void ladenMinute(void);
+
+/* start charging */
 void ladenOn(void);
+
+/* stop charging */
 void ladenOff(void);
 
 #endif

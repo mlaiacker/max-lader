@@ -11,20 +11,6 @@
 #include "laden.h"
 #include <avr/pgmspace.h>
 
-#define TASTE_BIT_ON	0 // taste gedrückt
-#define TASTE_BIT_FP	1 // tasten flanke positiv
-#define TASTE_BIT_FN	2 // tasten flanke negativ
-#define TASTE_BIT_LANG	3 // taste lang gedrückt
-#define TASTE_T_LANG		(20) // lang gedrückt [aufrufe]
-#define TASTE_T_INTERVAL	(MENU_DISPLAY_INT)	// abfrage interwall ms
-
-#define TASTE_ON(taste)		(taste.flags&(1<<TASTE_BIT_ON))
-#define TASTE_FP(taste)		(taste.flags&(1<<TASTE_BIT_FP))
-#define TASTE_FN(taste)		(taste.flags&(1<<TASTE_BIT_FN))
-#define TASTE_LANG(taste)		(taste.flags&(1<<TASTE_BIT_LANG))
-
-#define STEP_I	(50) //mA
-#define STEP_U	(10) // mV/10
 
 #define MENU_DISPLAY_INT	(50L)
 
@@ -75,21 +61,24 @@ typedef struct
 // globale Variablen
 extern tSettings settings;
 extern tMenu menu;
-extern tSettings eeSettings[] EEPROM;
-extern tTaste	tasteL,tasteM,tasteR;
+//extern tSettings eeSettings[] EEPROM;
+//extern tTaste	tasteL,tasteM,tasteR;
 extern unsigned char eeChargeMode EEPROM;
 
-typedef char tModeString[5];
-extern const tModeString modeName[MODE_NUM+2]	PROGMEM;
+//typedef char tModeString[5];
+//extern const tModeString modeName[MODE_NUM+2]	PROGMEM;
 extern const s16 cell_stop[MODE_NUM];
 extern const s16 cell_min[MODE_LI_NUM];
 
-// eeprom zeugs
 
-void ladermenuInit(void);
-void ladermenu(void);
-void saveSettings(eMode mode);
+/* mus be called once at start */
 void readSettings(eMode mode);
-void readTaste(tTaste *t, u08 input);
+
+void saveSettings(eMode mode);
+
+/* will print all LCD outputs and handle user inputs
+ * must be called every MENU_DISPLAY_INT ms
+ * */
 void showMenu(void);
+
 #endif

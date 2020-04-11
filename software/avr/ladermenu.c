@@ -16,6 +16,22 @@
 #include "pwmregler.h"
 #include "pwm.h"
 
+#define TASTE_BIT_ON	0 // taste gedrückt
+#define TASTE_BIT_FP	1 // tasten flanke positiv
+#define TASTE_BIT_FN	2 // tasten flanke negativ
+#define TASTE_BIT_LANG	3 // taste lang gedrückt
+#define TASTE_T_LANG		(20) // lang gedrückt [aufrufe]
+#define TASTE_T_INTERVAL	(MENU_DISPLAY_INT)	// abfrage interwall ms
+
+#define TASTE_ON(taste)		(taste.flags&(1<<TASTE_BIT_ON))
+#define TASTE_FP(taste)		(taste.flags&(1<<TASTE_BIT_FP))
+#define TASTE_FN(taste)		(taste.flags&(1<<TASTE_BIT_FN))
+#define TASTE_LANG(taste)		(taste.flags&(1<<TASTE_BIT_LANG))
+
+#define STEP_I	(50) //mA
+#define STEP_U	(10) // mV/10
+
+typedef char tModeString[5];
 
 const tModeString modeName[]	PROGMEM = // Lademodus
 {
@@ -90,6 +106,8 @@ tMenu menu;
 unsigned char eeChargeMode EEPROM;
 tSettings eeSettings[MODE_NUM] EEPROM;
 unsigned char eeBeepOn EEPROM;
+
+void readTaste(tTaste *t, u08 input);
 
 // setzt die flags im tasten struct, flanken und lang gedrückt
 void readTaste(tTaste *t, u08 input)
@@ -204,9 +222,10 @@ void showParam2(void)
 	}*/
 }
 
+/* read parameters from eeprom for curent mode*/
 void readSettings(eMode mode)
 {
-	eeprom_read_block(&settings,&eeSettings[mode],sizeof(tSettings));
+	eeprom_read_block(&settings, &eeSettings[mode], sizeof(tSettings));
 	if(((u08)(settings.iMax+settings.param2)) != settings.checkSum)
 	{
 		settings.iMax = 0;
@@ -214,11 +233,12 @@ void readSettings(eMode mode)
 	}
 }
 
+/* save parameters and 'checksum' to eeprom for curent mode*/
 void saveSettings(eMode mode)
 {
-	eeprom_write_byte(&eeChargeMode,(u08)mode);
+	eeprom_write_byte(&eeChargeMode, (u08)mode);
 	settings.checkSum = (u08)(settings.param2 + settings.iMax);
-	eeprom_write_block(&settings,&eeSettings[mode],sizeof(tSettings));
+	eeprom_write_block(&settings, &eeSettings[mode], sizeof(tSettings));
 }
 
 
@@ -256,34 +276,39 @@ void showLader(void)
 		if(menu.edit)
 		{ 
 			editVar(&settings.iMax, 0, IOUT_MAX, STEP_I); // maximalen Strom ändern
-		}
-		else 
+		} else
 		{
 			editVar(&menu.ladenNum, 0, LADEN_MAX_NUM, 1); // Anzeige der zweiten zeile auswählen
 		}
-		m=charger.mode;
+		m = charger.mode;
 		if(errorn)
 		{
 			m=eModeError; // wenn fehler dann "ERR" anzeigen
-		} else
-		if(charger.fertig && menu.blinken)
+		} else if(charger.fertig && menu.blinken)
 		{
 			m=eModeEnde; // wenn fertig dann abwechselnd "ENDE" und progamm anzeigen
 		}  
 		// erste zeile: Programm Spannung Strom
 		printModeString(m);	
-		lcdNum(charger.uOut,4,2);lcdDataWrite('V');
+		lcdNum(charger.uOut,4,2);
+		lcdDataWrite('V');
 		if(menu.edit)
 		{
 			lcdNum(settings.iMax/10,4,2);
 		} else
 		{
-			if((charger.mode==eModeNiCa)||(charger.mode==eModeNiMh)/*||(charger.mode==eModeTime)*/)lcdNum(charger.iMax/10,4,2);
-			else lcdNum(charger.iOut/10,4,2);
+			if((charger.mode==eModeNiCa)||(charger.mode==eModeNiMh)/*||(charger.mode==eModeTime)*/) {
+				lcdNum(charger.iMax/10,4,2);
+			} else {
+				lcdNum(charger.iOut/10,4,2);
+			}
 		}
-		
-		if(menu.edit&&menu.blinken) lcdPrintSpaces(1); // "A" blinkt wenn strom über tasten geändert werden kann.
-		else lcdDataWrite('A');
+		// "A" blinkt wenn strom über tasten geändert werden kann.
+		if(menu.edit&&menu.blinken){
+			lcdDataWrite(' ');
+		} else{
+			lcdDataWrite('A');
+		}
 		
 		lcdGotoY(1);// untere zeile
 		if(errorn && menu.blinken)
@@ -327,11 +352,11 @@ void showLader(void)
 		} else
 		if(menu.ladenNum==eLadenDt) // spannungsänderungen
 		{
-			lcdPrint("dut=");
-			lcdNum(charger.dut,3,0);
-			lcdPrint(" dutt=");
-			lcdNum(charger.ddutt,3,0);
-			
+			lcdPrint("du=");
+			lcdNum(charger.dut,2,0);
+			lcdPrint(" ddu=");
+			lcdNum(charger.ddutt,2,0);
+			lcdPrintSpaces(4);
 		}
 #if defined (__AVR_ATmega168__)
 		else if(menu.ladenNum==eLadenBalancer) // balancer
@@ -373,6 +398,17 @@ void showLader(void)
 
 void showMenu(void)
 {
+	#ifdef BEEP_ON
+	if( (charger.beep%2 == 1) && charger.on) BEEP_ON; else BEEP_OFF;
+	if(errorn)
+	{
+		if(charger.beep<BEEP_ERROR_COUNT*2) charger.beep++;
+	}
+	#endif
+	readTaste(&tasteL,TASTE_L);
+	readTaste(&tasteM,TASTE_M);
+	readTaste(&tasteR,TASTE_R);
+	//			if(TASTE_FP(tasteL)||TASTE_FP(tasteM)||TASTE_FP(tasteR)) BEEP_ON;
 	lcdGotoY(0);
 	if(TASTE_LANG(tasteM))	// laden starten/stoppen wenn mitlere taste lange gedrükt wird
 	{
@@ -444,30 +480,23 @@ void showMenu(void)
 		}
 
 		lcdGotoY(1); // zweite zeile
-		if(errorn && menu.blinken) 
-		{	
+		if(errorn && menu.blinken) {
 			showMeldung(); // fehlermeldungen
-		}
-		else
-		if(menu.edit)
-		{
+		} else if(menu.edit) {
 			lcdPrint("  -    OK    +  ");
-		} else
-		{
-			if(menu.topNum==eMenuStart)
-			{
+		} else {
+			if(menu.topNum==eMenuStart)	{
 				lcdNum(regler.uIn/10,3,1);
 				lcdPrint("V ");
-//				lcdPrintSpaces(6);
 				lcdPrint("Start  -> ");
-			} else
-			{
+			} else {
 				lcdPrint(" <-   Einst.");
 			}
-			if((menu.topNum==eMenuI)||(menu.topNum==eMenuParam2))
-			{
+			if((menu.topNum==eMenuI)||(menu.topNum==eMenuParam2)) {
 				lcdPrint(" -> ");
-			} else lcdPrintSpaces(4);
+			} else {
+				lcdPrintSpaces(4);
+			}
 		}
 		
 	}
