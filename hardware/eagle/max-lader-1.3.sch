@@ -8,20 +8,20 @@
 </settings>
 <grid distance="0.1" unitdist="inch" unit="inch" style="lines" multiple="1" display="no" altdistance="0.01" altunitdist="inch" altunit="inch"/>
 <layers>
-<layer number="1" name="Top" color="4" fill="1" visible="no" active="no"/>
-<layer number="16" name="Bottom" color="1" fill="1" visible="no" active="no"/>
-<layer number="17" name="Pads" color="2" fill="1" visible="no" active="no"/>
-<layer number="18" name="Vias" color="2" fill="1" visible="no" active="no"/>
-<layer number="19" name="Unrouted" color="6" fill="1" visible="no" active="no"/>
-<layer number="20" name="Dimension" color="15" fill="1" visible="no" active="no"/>
-<layer number="21" name="tPlace" color="7" fill="1" visible="no" active="no"/>
-<layer number="22" name="bPlace" color="7" fill="1" visible="no" active="no"/>
-<layer number="23" name="tOrigins" color="15" fill="1" visible="no" active="no"/>
-<layer number="24" name="bOrigins" color="15" fill="1" visible="no" active="no"/>
-<layer number="25" name="tNames" color="7" fill="1" visible="no" active="no"/>
-<layer number="26" name="bNames" color="7" fill="1" visible="no" active="no"/>
-<layer number="27" name="tValues" color="7" fill="1" visible="no" active="no"/>
-<layer number="28" name="bValues" color="7" fill="1" visible="no" active="no"/>
+<layer number="1" name="Top" color="4" fill="1" visible="yes" active="no"/>
+<layer number="16" name="Bottom" color="1" fill="1" visible="yes" active="no"/>
+<layer number="17" name="Pads" color="2" fill="1" visible="yes" active="no"/>
+<layer number="18" name="Vias" color="2" fill="1" visible="yes" active="no"/>
+<layer number="19" name="Unrouted" color="6" fill="1" visible="yes" active="no"/>
+<layer number="20" name="Dimension" color="15" fill="1" visible="yes" active="no"/>
+<layer number="21" name="tPlace" color="7" fill="1" visible="yes" active="no"/>
+<layer number="22" name="bPlace" color="7" fill="1" visible="yes" active="no"/>
+<layer number="23" name="tOrigins" color="15" fill="1" visible="yes" active="no"/>
+<layer number="24" name="bOrigins" color="15" fill="1" visible="yes" active="no"/>
+<layer number="25" name="tNames" color="7" fill="1" visible="yes" active="no"/>
+<layer number="26" name="bNames" color="7" fill="1" visible="yes" active="no"/>
+<layer number="27" name="tValues" color="7" fill="1" visible="yes" active="no"/>
+<layer number="28" name="bValues" color="7" fill="1" visible="yes" active="no"/>
 <layer number="29" name="tStop" color="7" fill="3" visible="no" active="no"/>
 <layer number="30" name="bStop" color="7" fill="6" visible="no" active="no"/>
 <layer number="31" name="tCream" color="7" fill="4" visible="no" active="no"/>
@@ -30,8 +30,8 @@
 <layer number="34" name="bFinish" color="6" fill="6" visible="no" active="no"/>
 <layer number="35" name="tGlue" color="7" fill="4" visible="no" active="no"/>
 <layer number="36" name="bGlue" color="7" fill="5" visible="no" active="no"/>
-<layer number="37" name="tTest" color="7" fill="1" visible="no" active="no"/>
-<layer number="38" name="bTest" color="7" fill="1" visible="no" active="no"/>
+<layer number="37" name="tTest" color="7" fill="1" visible="yes" active="no"/>
+<layer number="38" name="bTest" color="7" fill="1" visible="yes" active="no"/>
 <layer number="39" name="tKeepout" color="4" fill="11" visible="no" active="no"/>
 <layer number="40" name="bKeepout" color="1" fill="11" visible="no" active="no"/>
 <layer number="41" name="tRestrict" color="4" fill="10" visible="no" active="no"/>
@@ -39,13 +39,13 @@
 <layer number="43" name="vRestrict" color="2" fill="10" visible="no" active="no"/>
 <layer number="44" name="Drills" color="7" fill="1" visible="no" active="no"/>
 <layer number="45" name="Holes" color="7" fill="1" visible="no" active="no"/>
-<layer number="46" name="Milling" color="3" fill="1" visible="no" active="no"/>
-<layer number="47" name="Measures" color="7" fill="1" visible="no" active="no"/>
-<layer number="48" name="Document" color="7" fill="1" visible="no" active="no"/>
-<layer number="49" name="Reference" color="7" fill="1" visible="no" active="no"/>
-<layer number="50" name="dxf" color="7" fill="1" visible="no" active="no"/>
-<layer number="51" name="tDocu" color="7" fill="1" visible="no" active="no"/>
-<layer number="52" name="bDocu" color="7" fill="1" visible="no" active="no"/>
+<layer number="46" name="Milling" color="3" fill="1" visible="yes" active="no"/>
+<layer number="47" name="Measures" color="7" fill="1" visible="yes" active="no"/>
+<layer number="48" name="Document" color="7" fill="1" visible="yes" active="no"/>
+<layer number="49" name="Reference" color="7" fill="1" visible="yes" active="no"/>
+<layer number="50" name="dxf" color="7" fill="1" visible="yes" active="no"/>
+<layer number="51" name="tDocu" color="7" fill="1" visible="yes" active="no"/>
+<layer number="52" name="bDocu" color="7" fill="1" visible="yes" active="no"/>
 <layer number="91" name="Nets" color="2" fill="1" visible="yes" active="yes"/>
 <layer number="92" name="Busses" color="1" fill="1" visible="yes" active="yes"/>
 <layer number="93" name="Pins" color="2" fill="1" visible="no" active="yes"/>
@@ -13604,7 +13604,7 @@ USART&lt;p&gt;
 <part name="GND14" library="supply1" deviceset="GND" device=""/>
 <part name="P+3" library="supply1" deviceset="+5V" device=""/>
 <part name="C12" library="rcl" deviceset="C-EU" device="050-024X044" value="100n"/>
-<part name="R7" library="rcl" deviceset="R-EU_" device="0207/15" value="10k"/>
+<part name="R7" library="rcl" deviceset="R-EU_" device="R0805" value="10k"/>
 <part name="P+4" library="supply1" deviceset="+5V" device=""/>
 <part name="P+5" library="supply1" deviceset="+5V" device=""/>
 <part name="GND6" library="supply1" deviceset="GND" device=""/>
@@ -13640,7 +13640,7 @@ USART&lt;p&gt;
 <part name="LSP4" library="solpad" deviceset="SE13" device=""/>
 <part name="GND22" library="supply1" deviceset="GND" device=""/>
 <part name="IC5" library="avr2" deviceset="MEGA8-P" device="" value="MEGA168-P"/>
-<part name="R8" library="rcl" deviceset="R-EU_" device="0207/10" value="1k"/>
+<part name="R8" library="rcl" deviceset="R-EU_" device="R0805" value="1k"/>
 <part name="P+7" library="supply1" deviceset="+5V" device=""/>
 <part name="R9" library="ptc-ntc" deviceset="NTC642-6" device="" value="150R"/>
 <part name="GND25" library="supply1" deviceset="GND" device=""/>
@@ -13651,8 +13651,8 @@ USART&lt;p&gt;
 <part name="TASTER" library="switch" deviceset="BUTTON" device=""/>
 <part name="TASTEM" library="switch" deviceset="BUTTON" device=""/>
 <part name="TASTEL" library="switch" deviceset="BUTTON" device=""/>
-<part name="R22" library="rcl" deviceset="R-EU_" device="0207/10" value="1k"/>
-<part name="R23" library="rcl" deviceset="R-EU_" device="0207/10" value="1k"/>
+<part name="R22" library="rcl" deviceset="R-EU_" device="R0805" value="1k"/>
+<part name="R23" library="rcl" deviceset="R-EU_" device="R0805" value="1k"/>
 <part name="R24" library="rcl" deviceset="R-EU_" device="0207/10" value="10k"/>
 <part name="R25" library="rcl" deviceset="R-EU_" device="0207/10" value="100k"/>
 <part name="R26" library="rcl" deviceset="R-EU_" device="0207/10" value="10k"/>
@@ -13663,8 +13663,8 @@ USART&lt;p&gt;
 <part name="IC1" library="maxim" deviceset="MAX4105ESA" device="" value="OPA343"/>
 <part name="Q1" library="transistor-fet" deviceset="IRF9530" device="V" value="IRF4905"/>
 <part name="IC3" library="ic-package" deviceset="DIL8" device="" value="ICL 7667"/>
-<part name="R5" library="rcl" deviceset="R-EU_" device="0207/10" value="10k"/>
-<part name="R6" library="rcl" deviceset="R-EU_" device="0207/10" value="10k"/>
+<part name="R5" library="rcl" deviceset="R-EU_" device="R0805" value="10k"/>
+<part name="R6" library="rcl" deviceset="R-EU_" device="R0805" value="10k"/>
 <part name="GND12" library="supply1" deviceset="GND" device=""/>
 <part name="P+2" library="supply1" deviceset="+5V" device=""/>
 <part name="IC2" library="linear" deviceset="LM385" device="" value="LM385-2.5"/>
@@ -13677,6 +13677,8 @@ USART&lt;p&gt;
 <part name="P+6" library="supply1" deviceset="+5V" device=""/>
 <part name="R3" library="rcl" deviceset="R-EU_" device="0207/10" value="10R"/>
 <part name="JP3" library="pinhead" deviceset="PINHD-1X4" device=""/>
+<part name="R15" library="rcl" deviceset="R-EU_" device="R0805" value="1k"/>
+<part name="R18" library="rcl" deviceset="R-EU_" device="R0805" value="1k"/>
 </parts>
 <sheets>
 <sheet>
@@ -13802,6 +13804,8 @@ USART&lt;p&gt;
 <instance part="P+6" gate="1" x="198.12" y="-132.08"/>
 <instance part="R3" gate="G$1" x="205.74" y="-134.62"/>
 <instance part="JP3" gate="A" x="279.4" y="-119.38"/>
+<instance part="R15" gate="G$1" x="33.02" y="22.86" rot="R180"/>
+<instance part="R18" gate="G$1" x="40.64" y="2.54" rot="R180"/>
 </instances>
 <busses>
 </busses>
@@ -14071,12 +14075,12 @@ USART&lt;p&gt;
 </net>
 <net name="PWM_DOWN" class="0">
 <segment>
-<wire x1="48.26" y1="22.86" x2="17.78" y2="22.86" width="0.1524" layer="91"/>
+<wire x1="27.94" y1="22.86" x2="17.78" y2="22.86" width="0.1524" layer="91"/>
 <wire x1="17.78" y1="22.86" x2="7.62" y2="22.86" width="0.1524" layer="91"/>
 <junction x="17.78" y="22.86"/>
 <label x="10.16" y="25.4" size="1.778" layer="95"/>
-<pinref part="IC3" gate="G$1" pin="2"/>
 <pinref part="R5" gate="G$1" pin="2"/>
+<pinref part="R15" gate="G$1" pin="2"/>
 </segment>
 <segment>
 <wire x1="142.24" y1="-101.6" x2="160.02" y2="-101.6" width="0.1524" layer="91"/>
@@ -14086,14 +14090,12 @@ USART&lt;p&gt;
 </net>
 <net name="PWM_UP" class="0">
 <segment>
-<wire x1="48.26" y1="17.78" x2="45.72" y2="17.78" width="0.1524" layer="91"/>
-<wire x1="45.72" y1="17.78" x2="45.72" y2="2.54" width="0.1524" layer="91"/>
-<wire x1="45.72" y1="2.54" x2="30.48" y2="2.54" width="0.1524" layer="91"/>
+<wire x1="35.56" y1="2.54" x2="30.48" y2="2.54" width="0.1524" layer="91"/>
 <wire x1="30.48" y1="2.54" x2="7.62" y2="2.54" width="0.1524" layer="91"/>
 <junction x="30.48" y="2.54"/>
 <label x="12.7" y="2.54" size="1.778" layer="95"/>
-<pinref part="IC3" gate="G$1" pin="4"/>
 <pinref part="R6" gate="G$1" pin="1"/>
+<pinref part="R18" gate="G$1" pin="2"/>
 </segment>
 <segment>
 <wire x1="160.02" y1="-104.14" x2="142.24" y2="-104.14" width="0.1524" layer="91"/>
@@ -14304,14 +14306,13 @@ USART&lt;p&gt;
 <net name="I_SENS" class="0">
 <segment>
 <wire x1="228.6" y1="53.34" x2="218.44" y2="53.34" width="0.1524" layer="91"/>
-<wire x1="218.44" y1="53.34" x2="215.9" y2="53.34" width="0.1524" layer="91"/>
-<wire x1="215.9" y1="53.34" x2="218.44" y2="60.96" width="0.1524" layer="91"/>
+<wire x1="218.44" y1="53.34" x2="218.44" y2="60.96" width="0.1524" layer="91"/>
 <wire x1="198.12" y1="53.34" x2="198.12" y2="10.16" width="0.1524" layer="91"/>
 <wire x1="198.12" y1="53.34" x2="205.74" y2="53.34" width="0.1524" layer="91"/>
-<wire x1="205.74" y1="53.34" x2="215.9" y2="53.34" width="0.1524" layer="91"/>
+<wire x1="205.74" y1="53.34" x2="218.44" y2="53.34" width="0.1524" layer="91"/>
 <wire x1="198.12" y1="10.16" x2="220.98" y2="10.16" width="0.1524" layer="91"/>
 <junction x="218.44" y="53.34"/>
-<junction x="215.9" y="53.34"/>
+<junction x="218.44" y="53.34"/>
 <junction x="205.74" y="53.34"/>
 <label x="203.2" y="10.16" size="1.778" layer="95"/>
 <pinref part="H2" gate="G$1" pin="MOUNT"/>
@@ -14611,6 +14612,21 @@ USART&lt;p&gt;
 <wire x1="210.82" y1="-129.54" x2="226.06" y2="-129.54" width="0.1524" layer="91"/>
 <pinref part="R3" gate="G$1" pin="2"/>
 <pinref part="JP2" gate="A" pin="15"/>
+</segment>
+</net>
+<net name="N$1" class="0">
+<segment>
+<pinref part="IC3" gate="G$1" pin="4"/>
+<wire x1="48.26" y1="17.78" x2="45.72" y2="17.78" width="0.1524" layer="91"/>
+<wire x1="45.72" y1="17.78" x2="45.72" y2="2.54" width="0.1524" layer="91"/>
+<pinref part="R18" gate="G$1" pin="1"/>
+</segment>
+</net>
+<net name="N$3" class="0">
+<segment>
+<pinref part="IC3" gate="G$1" pin="2"/>
+<wire x1="48.26" y1="22.86" x2="38.1" y2="22.86" width="0.1524" layer="91"/>
+<pinref part="R15" gate="G$1" pin="1"/>
 </segment>
 </net>
 </nets>

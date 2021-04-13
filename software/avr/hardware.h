@@ -204,16 +204,19 @@
 
 /* ### uart ### */
 #define UART // wir machen Ausgaben über die serielle Schnittstelle
+// Baudrate
+#define UART_BAUD_RATE	38400
 #if defined (__AVR_ATmega168__)
 //	#define DEBUG_OSC
 
-//	#define UART_BAUD_RATE	9600
-	#define UART_BAUD_RATE	38400
-// Baudrate
 #elif defined (__AVR_ATmega8__)
-	#define UART_BAUD_RATE	9600
+#if UART_BAUD_RATE==9600
 	#define UART_UBRRL	(103) // 9600@16MHz U2X = 0
-//	#define UART_UBRRL	(25) // 38400@16MHz U2X = 0
+#elif UART_BAUD_RATE==38400
+	#define UART_UBRRL	(25) // 38400@16MHz U2X = 0
+#else
+#error "unsupported baudrate"
+#endif
 #endif
 
 
